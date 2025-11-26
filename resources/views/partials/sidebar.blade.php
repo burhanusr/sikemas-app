@@ -164,25 +164,6 @@
                 @endif
             </ul>
         </nav>
-
-        <!-- User Section -->
-        {{-- <div class="border-t border-green-100 p-4">
-            <div class="flex items-center space-x-3">
-                @if (Auth::user()->photo)
-                    <img src="{{ asset('storage/' . Auth::user()->photo) }}" alt="{{ Auth::user()->name }}"
-                        class="h-10 w-10 flex-shrink-0 rounded-full border-2 border-green-200 object-cover shadow-md">
-                @else
-                    <div
-                        class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-emerald-600 shadow-md">
-                        <span class="text-sm font-bold text-white">{{ substr(Auth::user()->name, 0, 2) }}</span>
-                    </div>
-                @endif
-                <div class="sidebar-text overflow-hidden">
-                    <p class="truncate text-sm font-medium text-gray-700">{{ Auth::user()->name }}</p>
-                    <p class="text-xs capitalize text-gray-500">{{ Auth::user()->role }}</p>
-                </div>
-            </div>
-        </div> --}}
     </div>
 </aside>
 

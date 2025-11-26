@@ -83,16 +83,10 @@
                     </div>
                 </div>
 
-                <div class="flex items-center">
-                    <input id="remember" name="remember" type="checkbox"
-                        class="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500">
-                    <label for="remember" class="ml-2 block text-sm text-gray-700">
-                        Ingat saya
-                    </label>
-                </div>
+
 
                 <button type="submit"
-                    class="w-full transform rounded-lg bg-gradient-to-r from-green-500 to-emerald-600 px-4 py-3 font-medium text-white shadow-lg transition-all duration-200 hover:scale-[1.02] hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 active:scale-[0.98]">
+                    class="mt-4 w-full transform rounded-lg bg-gradient-to-r from-green-500 to-emerald-600 px-4 py-3 font-medium text-white shadow-lg transition-all duration-200 hover:scale-[1.02] hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 active:scale-[0.98]">
                     Masuk
                 </button>
             </form>

@@ -209,7 +209,6 @@ class KasController extends Controller
                 ->where('id', '>', $kas->id)
                 ->increment('saldo', $selisih);
 
-            // Hapus jurnal umum terkait (akan otomatis terhapus karena cascade)
             $kas->delete();
         });
 
@@ -221,11 +220,9 @@ class KasController extends Controller
             ->with('success', "Data {$jenis} berhasil dihapus.");
     }
 
-    // Helper method untuk membuat jurnal umum
     private function createJurnalEntry($kas)
     {
         if ($kas->jenis === 'pemasukan') {
-            // Debit: Kas, Kredit: Akun Pemasukan
             JurnalUmum::create([
                 'user_id' => $kas->user_id,
                 'kas_id' => $kas->id,
@@ -269,21 +266,13 @@ class KasController extends Controller
         }
     }
 
-    // Helper method untuk update jurnal umum
     private function updateJurnalEntry($kas)
     {
-        // Hapus jurnal lama
         JurnalUmum::where('kas_id', $kas->id)->delete();
 
-        // Buat jurnal baru
         $this->createJurnalEntry($kas);
     }
 
-    /**
-     * Helper method to determine which user's data to show
-     * Superadmin can view any user's data via ?user_id=X
-     * Regular users can only view their own data
-     */
     private function getUserId(Request $request)
     {
         if (Auth::user()->role === 'superadmin' && $request->filled('user_id')) {

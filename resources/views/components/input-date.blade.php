@@ -14,7 +14,7 @@
 @endphp
 
 <div class="flex w-full flex-col space-y-1">
-    {{-- Label opsional dengan tanda * jika required --}}
+
     @if ($label)
         <label for="{{ $id }}" class="text-sm font-medium text-gray-700">
             {{ $label }}
@@ -37,7 +37,6 @@
         const input = document.getElementById("{{ $id }}");
         if (!input) return;
 
-        // Saat diklik, langsung buka date picker
         input.addEventListener("click", function() {
             if (typeof this.showPicker === "function") {
                 this.showPicker();

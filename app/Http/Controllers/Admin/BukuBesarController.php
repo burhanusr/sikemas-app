@@ -39,14 +39,11 @@ class BukuBesarController extends Controller
                     ->where('user_id', $userId)
                     ->where('kodeakun_id', $selectedAkun->id);
 
-                // Date from filter
                 if ($request->filled('tanggal_dari')) {
-                    // Hitung saldo awal
                     $saldoAwal = $this->hitungSaldoAwal($userId, $selectedAkun->id, $request->tanggal_dari);
                     $query->whereDate('tanggal', '>=', $request->tanggal_dari);
                 }
 
-                // Date to filter
                 if ($request->filled('tanggal_sampai')) {
                     $query->whereDate('tanggal', '<=', $request->tanggal_sampai);
                 }
@@ -60,7 +57,6 @@ class BukuBesarController extends Controller
                 // Saldo akhir = saldo awal + total debit - total kredit
                 $saldoAkhir = $saldoAwal + $totalDebit - $totalKredit;
 
-                // Tambahkan running balance untuk setiap transaksi
                 $runningBalance = $saldoAwal;
                 $bukuBesar->transform(function ($item) use (&$runningBalance) {
                     $runningBalance += $item->debit - $item->kredit;
@@ -97,11 +93,6 @@ class BukuBesarController extends Controller
         return $debit - $kredit;
     }
 
-    /**
-     * Helper method to determine which user's data to show
-     * Superadmin can view any user's data via ?user_id=X
-     * Regular users can only view their own data
-     */
     private function getUserId(Request $request)
     {
         if (Auth::user()->role === 'superadmin' && $request->filled('user_id')) {

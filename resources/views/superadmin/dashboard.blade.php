@@ -262,16 +262,6 @@
                     <h4 class="mb-2 text-lg font-semibold">Tambah Admin</h4>
                     <p class="text-sm text-indigo-100">Buat akun administrator baru</p>
                 </a>
-
-                {{-- <a href="{{ route('laporan.konsolidasi') }}"
-                    class="transform rounded-xl bg-gradient-to-br from-green-600 to-emerald-700 p-6 text-left text-white shadow-md transition-all hover:scale-105 hover:from-green-700 hover:to-emerald-800 hover:shadow-lg">
-                    <svg class="mb-3 h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    <h4 class="mb-2 text-lg font-semibold">Laporan Konsolidasi</h4>
-                    <p class="text-sm text-green-100">Laporan keuangan semua masjid</p>
-                </a> --}}
             </div>
         </div>
     </div>

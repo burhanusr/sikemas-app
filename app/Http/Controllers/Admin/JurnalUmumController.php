@@ -60,11 +60,6 @@ class JurnalUmumController extends Controller
         return view('admin.jurnal-umum', compact('jurnal', 'kodeAkun', 'totalDebit', 'totalKredit', 'user'));
     }
 
-    /**
-     * Helper method to determine which user's data to show
-     * Superadmin can view any user's data via ?user_id=X
-     * Regular users can only view their own data
-     */
     private function getUserId(Request $request)
     {
         if (Auth::user()->role === 'superadmin' && $request->filled('user_id')) {

@@ -48,27 +48,3 @@ class Discussion extends Model
             ->count();
     }
 }
-
-class DiscussionMessage extends Model
-{
-    protected $fillable = [
-        'discussion_id',
-        'user_id',
-        'message',
-        'is_read'
-    ];
-
-    protected $casts = [
-        'is_read' => 'boolean',
-    ];
-
-    public function discussion(): BelongsTo
-    {
-        return $this->belongsTo(Discussion::class);
-    }
-
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
-}

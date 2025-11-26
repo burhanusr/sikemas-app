@@ -47,7 +47,7 @@
         const hidden = document.getElementById("{{ $id }}-value");
         if (!input || !list) return;
 
-        // Ambil option dari slot
+
         const slotOptions = list.querySelectorAll("option");
         const generated = [];
 
@@ -58,13 +58,12 @@
             li.textContent = opt.textContent.trim();
             list.appendChild(li);
             generated.push(li);
-            opt.remove(); // hapus option asli
+            opt.remove();
         });
 
-        // Tampilkan list saat fokus
         input.addEventListener("focus", () => list.classList.remove("hidden"));
 
-        // Sembunyikan list saat blur dengan delay agar click bisa tereksekusi
+
         input.addEventListener("blur", () => setTimeout(() => list.classList.add("hidden"), 150));
 
         // Filter search

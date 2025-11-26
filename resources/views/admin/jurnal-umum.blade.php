@@ -5,7 +5,6 @@
 @section('content')
     <div class="rounded-xl border border-blue-100 bg-white shadow-lg">
         <div class="space-y-6 p-6">
-            <!-- Viewing Context Banner (for Superadmin) -->
             @if (isset($user) && $user->id !== Auth::id())
                 <div
                     class="animate-fade-in rounded-lg border border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 p-4 shadow-sm">
@@ -373,7 +372,6 @@
                 }
             @endif
 
-            // Submit form on Enter key press in search input
             const searchInput = document.getElementById('searchInput');
             if (searchInput) {
                 searchInput.addEventListener('keypress', function(e) {

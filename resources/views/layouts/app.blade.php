@@ -40,7 +40,10 @@
 
     <!-- Mobile Overlay -->
     <div id="sidebar-overlay" class="fixed inset-0 z-20 hidden bg-black bg-opacity-50 md:hidden"
-        onclick="toggleMobileMenu()"></div>
+        onclick="toggleMobileMenu()">
+    </div>
+
+    {{-- <script src="{{ asset('js/discussion-manager.js') }}"></script> --}}
 
     <script>
         // Toggle Sidebar

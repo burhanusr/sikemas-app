@@ -38,13 +38,13 @@ class DiscussionController extends Controller
         return response()->json($discussions);
     }
 
-    // Create new discussion
+
     public function store(Request $request)
     {
         $request->validate([
             'subject' => 'required|string|max:255',
             'message' => 'required|string',
-            'admin_id' => 'nullable|exists:users,id' // For superadmin creating discussion
+            'admin_id' => 'nullable|exists:users,id'
         ]);
 
         $userId = Auth::id();
@@ -100,7 +100,6 @@ class DiscussionController extends Controller
         return response()->json($discussion);
     }
 
-    // Send message
     public function sendMessage(Request $request, $id)
     {
         $request->validate([
@@ -155,7 +154,6 @@ class DiscussionController extends Controller
         return response()->json($messages);
     }
 
-    // Close discussion
     public function close($id)
     {
         $userId = Auth::id();
@@ -172,7 +170,7 @@ class DiscussionController extends Controller
         return response()->json(['message' => 'Discussion closed successfully']);
     }
 
-    // Reopen discussion
+
     public function reopen($id)
     {
         $userId = Auth::id();

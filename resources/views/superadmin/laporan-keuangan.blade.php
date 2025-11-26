@@ -248,9 +248,9 @@
                                             <!-- Diskusi -->
                                             <button
                                                 onclick="openDiscussion({{ $mosque->id }}, '{{ $mosque->organization }}', '{{ $mosque->name }}')"
-                                                class="group relative rounded-lg bg-amber-50 p-2 transition-all hover:bg-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                                class="group relative rounded-lg bg-orange-50 p-2 transition-all hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-500"
                                                 title="Diskusi">
-                                                <svg class="h-5 w-5 text-amber-600" fill="none" stroke="currentColor"
+                                                <svg class="h-5 w-5 text-orange-600" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                         d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -309,8 +309,8 @@
         <div class="modal-content w-full max-w-md rounded-xl bg-white shadow-2xl">
             <div class="p-6">
                 <div class="mb-4 flex items-center justify-center">
-                    <div class="rounded-full bg-amber-100 p-3">
-                        <svg class="h-6 w-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="rounded-full bg-orange-100 p-3">
+                        <svg class="h-6 w-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                         </svg>
@@ -324,7 +324,7 @@
                         Batal
                     </button>
                     <button onclick="confirmAction()" id="confirmButton"
-                        class="flex-1 rounded-lg bg-amber-500 px-4 py-2 font-medium text-white hover:bg-amber-600">
+                        class="flex-1 rounded-lg bg-orange-500 px-4 py-2 font-medium text-white hover:bg-orange-600">
                         Ya, Lanjutkan
                     </button>
                 </div>
@@ -380,15 +380,16 @@
 
     <!-- Discussion Modal -->
     <div id="discussionModal"
-        class="modal-overlay fixed inset-0 z-50 hidden items-center justify-center bg-black/30 p-4 backdrop-blur-sm">
-        <div class="modal-content w-full max-w-4xl rounded-xl bg-white shadow-2xl">
+        class="fixed inset-0 z-50 hidden items-center justify-center bg-black/30 p-4 backdrop-blur-sm">
+        <div class="flex h-[90vh] w-full max-w-4xl transform flex-col rounded-xl bg-white shadow-2xl">
             <!-- Modal Header -->
-            <div class="flex items-center justify-between border-b border-gray-200 p-4">
+            <div
+                class="flex items-center justify-between rounded-t-xl bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-4">
                 <div>
-                    <h3 class="text-lg font-bold text-gray-800" id="modalMosqueName"></h3>
-                    <p class="text-sm text-gray-600" id="modalAdminName"></p>
+                    <h3 class="text-xl font-bold text-white" id="modalMosqueName"></h3>
+                    <p class="mt-1 text-sm text-orange-50" id="modalAdminName"></p>
                 </div>
-                <button onclick="closeDiscussion()" class="text-gray-400 hover:text-gray-600">
+                <button onclick="closeDiscussion()" class="text-white transition-colors hover:text-gray-200">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -396,12 +397,12 @@
             </div>
 
             <!-- Discussions List / Chat View -->
-            <div class="flex h-[600px]">
+            <div class="flex flex-1 overflow-hidden">
                 <!-- Left Sidebar - Discussion List -->
-                <div class="w-80 rounded-bl-xl border-r border-gray-200 bg-gray-50">
-                    <div class="p-4">
+                <div class="w-1/3 rounded-bl-xl border-r border-gray-200 bg-gray-50">
+                    <div class="border-b border-gray-200 p-4">
                         <button onclick="showNewDiscussionForm()"
-                            class="w-full rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600">
+                            class="w-full rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-orange-600">
                             <svg class="mr-2 inline-block h-4 w-4" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -410,8 +411,10 @@
                             Diskusi Baru
                         </button>
                     </div>
-                    <div id="discussionsList" class="overflow-y-auto" style="height: calc(100% - 80px);">
-                        <!-- Will be populated by JavaScript -->
+                    <div id="discussionsList" class="overflow-y-auto" style="height: calc(90vh - 170px);">
+                        <div class="p-4 text-center text-sm text-gray-500">
+                            Memuat diskusi...
+                        </div>
                     </div>
                 </div>
 
@@ -421,20 +424,18 @@
                     <div id="newDiscussionForm" class="hidden flex-1 flex-col p-6">
                         <h4 class="mb-4 text-lg font-semibold text-gray-800">Buat Diskusi Baru</h4>
                         <div class="mb-4">
-                            <label class="mb-2 block text-sm font-medium text-gray-700">Subjek</label>
                             <input type="text" id="discussionSubject"
-                                class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
-                                placeholder="Masukkan subjek diskusi...">
+                                class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                placeholder="Subjek diskusi...">
                         </div>
-                        <div class="mb-4 flex-1">
-                            <label class="mb-2 block text-sm font-medium text-gray-700">Pesan</label>
-                            <textarea id="discussionMessage" rows="10"
-                                class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                        <div class="mb-4">
+                            <textarea id="discussionMessage" style="resize: none;"
+                                class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
                                 placeholder="Tulis pesan Anda..."></textarea>
                         </div>
                         <div class="flex gap-2">
                             <button onclick="createDiscussion()"
-                                class="rounded-lg bg-amber-500 px-6 py-2 text-white hover:bg-amber-600">
+                                class="rounded-lg bg-orange-500 px-6 py-2 text-white hover:bg-orange-600">
                                 Kirim
                             </button>
                             <button onclick="hideNewDiscussionForm()"
@@ -446,19 +447,20 @@
 
                     <!-- Chat View -->
                     <div id="chatView" class="hidden flex-1 flex-col">
-                        <!-- Messages Container -->
-                        <div id="messagesContainer" class="flex-1 overflow-y-auto p-6">
-                            <!-- Will be populated by JavaScript -->
+                        <div class="border-b border-gray-200 p-4">
+                            <h4 id="chatSubject" class="font-semibold text-gray-800"></h4>
+                        </div>
+                        <div id="chatMessages" class="flex-1 overflow-y-auto p-4" style="height: calc(90vh - 220px);">
                         </div>
 
                         <!-- Message Input -->
                         <div class="border-t border-gray-200 p-4">
                             <div class="flex gap-2">
-                                <input type="text" id="messageInput"
-                                    class="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
-                                    placeholder="Ketik pesan..." onkeypress="handleMessageKeyPress(event)">
+                                <textarea id="messageInput" rows="1" placeholder="Tulis pesan..." style="resize: none;"
+                                    class="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                    placeholder="Ketik pesan..." onkeypress="handleMessageKeyPress(event)"></textarea>
                                 <button onclick="sendMessage()"
-                                    class="rounded-lg bg-amber-500 px-6 py-2 text-white hover:bg-amber-600">
+                                    class="rounded-lg bg-orange-500 px-6 py-2 text-white hover:bg-orange-600">
                                     Kirim
                                 </button>
                             </div>
@@ -482,138 +484,150 @@
     </div>
 
     <script>
-        let currentAdminId = null;
-        let currentDiscussionId = null;
-        let lastMessageId = 0;
-        let pollingInterval = null;
-        let userId = {{ Auth::id() }};
-        let confirmCallback = null;
-
-        // Submit form on Enter key press in search input
         document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('searchInput');
-            if (searchInput) {
-                searchInput.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        document.getElementById('filterForm').submit();
+
+            const originalUnreadCallback = discussionManager.onUnreadCountsUpdated;
+            const originalDiscussionsCallback = discussionManager.onDiscussionsUpdated;
+            const originalMessagesCallback = discussionManager.onNewMessageReceived;
+
+            discussionManager.onUnreadCountsUpdated = (unreadByAdmin, totalUnread) => {
+
+                if (originalUnreadCallback) {
+                    originalUnreadCallback(unreadByAdmin, totalUnread);
+                }
+
+                updateLaporanUnreadBadges(unreadByAdmin);
+            };
+
+            discussionManager.onDiscussionsUpdated = (discussions) => {
+
+                const headerModal = document.getElementById('headerDiscussionModal');
+                const isHeaderOpen = headerModal && !headerModal.classList.contains('hidden');
+
+                if (isHeaderOpen && !discussionManager.getCurrentAdmin()) {
+                    if (originalDiscussionsCallback) {
+                        originalDiscussionsCallback(discussions);
                     }
-                });
-            }
+                }
 
-            // Load unread counts on page load
-            loadUnreadCounts();
 
-            // Refresh unread counts every 30 seconds
-            setInterval(loadUnreadCounts, 30000);
+                const laporanModal = document.getElementById('discussionModal');
+                const isLaporanOpen = laporanModal && !laporanModal.classList.contains('hidden');
+
+                if (isLaporanOpen && discussionManager.getCurrentAdmin()) {
+                    renderLaporanDiscussions(discussions);
+                }
+            };
+
+            discussionManager.onNewMessageReceived = (newMessages) => {
+
+                const headerModal = document.getElementById('headerDiscussionModal');
+                const isHeaderOpen = headerModal && !headerModal.classList.contains('hidden');
+                const headerChatView = document.getElementById('headerChatView');
+                const isHeaderChatOpen = headerChatView && !headerChatView.classList.contains('hidden');
+
+                const laporanModal = document.getElementById('discussionModal');
+                const isLaporanOpen = laporanModal && !laporanModal.classList.contains('hidden');
+                const laporanChatView = document.getElementById('chatView');
+                const isLaporanChatOpen = laporanChatView && !laporanChatView.classList.contains('hidden');
+
+                if (isHeaderOpen && isHeaderChatOpen && originalMessagesCallback) {
+                    originalMessagesCallback(newMessages);
+                }
+
+                if (isLaporanOpen && isLaporanChatOpen) {
+                    appendLaporanMessages(newMessages);
+                }
+            };
         });
 
-        // Modal Functions
-        function showConfirmModal(title, message, callback) {
-            document.getElementById('confirmTitle').textContent = title;
-            document.getElementById('confirmMessage').textContent = message;
-            confirmCallback = callback;
-            document.getElementById('confirmModal').classList.remove('hidden');
-            document.getElementById('confirmModal').classList.add('flex');
-        }
 
-        function closeConfirmModal() {
-            document.getElementById('confirmModal').classList.add('hidden');
-            document.getElementById('confirmModal').classList.remove('flex');
-            confirmCallback = null;
-        }
-
-        function confirmAction() {
-            if (confirmCallback) {
-                confirmCallback();
-            }
-            closeConfirmModal();
-        }
-
-        function showSuccessModal(message) {
-            document.getElementById('successMessage').textContent = message;
-            document.getElementById('successModal').classList.remove('hidden');
-            document.getElementById('successModal').classList.add('flex');
-        }
-
-        function closeSuccessModal() {
-            document.getElementById('successModal').classList.add('hidden');
-            document.getElementById('successModal').classList.remove('flex');
-        }
-
-        function showErrorModal(message) {
-            document.getElementById('errorMessage').textContent = message;
-            document.getElementById('errorModal').classList.remove('hidden');
-            document.getElementById('errorModal').classList.add('flex');
-        }
-
-        function closeErrorModal() {
-            document.getElementById('errorModal').classList.add('hidden');
-            document.getElementById('errorModal').classList.remove('flex');
-        }
 
         function openDiscussion(adminId, mosqueName, adminName) {
-            // Reset state when switching admins
-            if (currentAdminId !== adminId) {
-                currentDiscussionId = null;
-                lastMessageId = 0;
-                stopPolling();
+            // Set current admin
+            discussionManager.setCurrentAdmin(adminId);
 
-                // Reset view to empty state
-                document.getElementById('emptyState').classList.remove('hidden');
-                document.getElementById('chatView').classList.add('hidden');
-                document.getElementById('newDiscussionForm').classList.add('hidden');
-                document.getElementById('messagesContainer').innerHTML = '';
-                document.getElementById('discussionsList').innerHTML = '';
-            }
-
-            currentAdminId = adminId;
+            // Update modal title
             document.getElementById('modalMosqueName').textContent = mosqueName;
             document.getElementById('modalAdminName').textContent = `Admin: ${adminName}`;
-            document.getElementById('discussionModal').classList.remove('hidden');
-            document.getElementById('discussionModal').classList.add('flex');
 
-            loadDiscussions();
+            // Show modal
+            const modal = document.getElementById('discussionModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            // Reset view
+            document.getElementById('emptyState').classList.remove('hidden');
+            document.getElementById('chatView').classList.add('hidden');
+            document.getElementById('newDiscussionForm').classList.add('hidden');
+
+            // Trigger immediate update
+            discussionManager.updateAll();
         }
 
         function closeDiscussion() {
-            document.getElementById('discussionModal').classList.add('hidden');
-            document.getElementById('discussionModal').classList.remove('flex');
-            currentAdminId = null;
-            currentDiscussionId = null;
-            stopPolling();
+            const modal = document.getElementById('discussionModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+
+            // Clear admin state
+            discussionManager.clearCurrentAdmin();
         }
 
-        async function loadDiscussions() {
-            try {
-                const response = await fetch(`/discussions?admin_id=${currentAdminId}`, {
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json'
+        // ============================================
+        // DISCUSSIONS LIST
+        // ============================================
+
+        function renderLaporanDiscussions(discussions) {
+            const listHtml = discussions.map(d => `
+        <div onclick="selectLaporanDiscussion(${d.id})"
+            class="cursor-pointer border-b border-gray-200 p-4 transition-colors hover:bg-gray-100 ${discussionManager.getCurrentDiscussion() === d.id ? 'bg-orange-50' : ''}">
+            <div class="flex items-start justify-between">
+                <div class="flex-1">
+                    <h5 class="font-semibold text-gray-800">${d.subject}</h5>
+                    <p class="text-xs text-gray-500">${discussionManager.formatDate(d.last_message_at || d.created_at)}</p>
+                </div>
+                ${d.unread_count > 0 ? `
+                                        <span class="ml-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white">
+                                            ${d.unread_count}
+                                        </span>
+                                    ` : ''}
+            </div>
+            ${d.latest_message ? `
+                                    <p class="mt-1 truncate text-sm text-gray-600">${d.latest_message.message}</p>
+                                ` : ''}
+
+        </div>
+    `).join('');
+
+            document.getElementById('discussionsList').innerHTML = listHtml ||
+                '<p class="p-4 text-center text-sm text-gray-500">Belum ada diskusi</p>';
+        }
+
+        // ============================================
+        // UNREAD BADGES
+        // ============================================
+
+        function updateLaporanUnreadBadges(unreadByAdmin) {
+            Object.keys(unreadByAdmin).forEach(adminId => {
+                const badge = document.getElementById(`unread-badge-${adminId}`);
+                if (badge) {
+                    const count = unreadByAdmin[adminId];
+                    if (count > 0) {
+                        badge.textContent = count > 9 ? '9+' : count;
+                        badge.classList.remove('hidden');
+                        badge.classList.add('flex');
+                    } else {
+                        badge.classList.add('hidden');
+                        badge.classList.remove('flex');
                     }
-                });
-                const discussions = await response.json();
-
-                const listHtml = discussions.map(d => `
-                    <div onclick="selectDiscussion(${d.id})" class="cursor-pointer border-b border-gray-200 p-4 transition-colors hover:bg-gray-100 ${currentDiscussionId === d.id ? 'bg-amber-50' : ''}">
-                        <div class="flex items-start justify-between">
-                            <div class="flex-1">
-                                <h5 class="font-semibold text-gray-800">${d.subject}</h5>
-                                <p class="text-xs text-gray-500">${formatDate(d.last_message_at || d.created_at)}</p>
-                            </div>
-                            ${d.unread_count > 0 ? `<span class="ml-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white">${d.unread_count}</span>` : ''}
-                        </div>
-                        ${d.latest_message ? `<p class="mt-1 truncate text-sm text-gray-600">${d.latest_message.message}</p>` : ''}
-                        <span class="mt-1 inline-block rounded px-2 py-0.5 text-xs ${d.status === 'open' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">${d.status === 'open' ? 'Aktif' : 'Ditutup'}</span>
-                    </div>
-                `).join('');
-
-                document.getElementById('discussionsList').innerHTML = listHtml ||
-                    '<p class="p-4 text-center text-sm text-gray-500">Belum ada diskusi</p>';
-            } catch (error) {
-                console.error('Error loading discussions:', error);
-            }
+                }
+            });
         }
+
+        // ============================================
+        // NEW DISCUSSION FORM
+        // ============================================
 
         function showNewDiscussionForm() {
             document.getElementById('emptyState').classList.add('hidden');
@@ -635,121 +649,101 @@
             const message = document.getElementById('discussionMessage').value.trim();
 
             if (!subject || !message) {
-                showErrorModal('Subjek dan pesan harus diisi');
+                alert('Subjek dan pesan harus diisi');
                 return;
             }
 
-            try {
-                const response = await fetch('/discussions', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        admin_id: currentAdminId,
-                        subject: subject,
-                        message: message
-                    })
-                });
+            const adminId = discussionManager.getCurrentAdmin();
+            const discussion = await discussionManager.createDiscussion(adminId, subject, message);
 
-                if (response.ok) {
-                    const discussion = await response.json();
-                    hideNewDiscussionForm();
-                    await loadDiscussions();
-                    selectDiscussion(discussion.id);
-                    showSuccessModal('Diskusi berhasil dibuat');
-                } else {
-                    showErrorModal('Gagal membuat diskusi');
-                }
-            } catch (error) {
-                console.error('Error creating discussion:', error);
-                showErrorModal('Terjadi kesalahan saat membuat diskusi');
+            if (discussion) {
+                hideNewDiscussionForm();
+                selectLaporanDiscussion(discussion.id);
+            } else {
+                alert('Gagal membuat diskusi');
             }
         }
 
-        async function selectDiscussion(discussionId) {
-            currentDiscussionId = discussionId;
-            lastMessageId = 0;
+        // ============================================
+        // CHAT VIEW
+        // ============================================
 
+        async function selectLaporanDiscussion(discussionId) {
+            discussionManager.setCurrentDiscussion(discussionId);
+
+            // Update UI
             document.getElementById('emptyState').classList.add('hidden');
             document.getElementById('newDiscussionForm').classList.add('hidden');
             document.getElementById('newDiscussionForm').classList.remove('flex');
             document.getElementById('chatView').classList.remove('hidden');
-            document.getElementById('chatView').classList.add('flex');
 
-            await loadMessages();
-            await loadDiscussions(); // Refresh list to update unread count
+            // Load messages
+            const discussion = await discussionManager.fetchDiscussionById(discussionId);
 
-            stopPolling();
-            startPolling();
-        }
-
-        async function loadMessages() {
-            try {
-                const response = await fetch(`/discussions/${currentDiscussionId}`, {
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json'
-                    }
-                });
-                const discussion = await response.json();
-
-                const messagesHtml = discussion.messages.map(m => `
-                    <div class="mb-4 flex ${m.user_id === userId ? 'justify-end' : 'justify-start'}">
-                        <div class="max-w-[70%]">
-                            <div class="mb-1 flex items-center gap-2 ${m.user_id === userId ? 'flex-row-reverse' : ''}">
-                                <span class="text-xs font-semibold text-gray-700">${m.user.name}</span>
-                                <span class="text-xs text-gray-400">${formatTime(m.created_at)}</span>
-                            </div>
-                            <div class="rounded-lg px-4 py-2 ${m.user_id === userId ? 'bg-amber-500 text-white' : 'bg-gray-100 text-gray-800'}">
-                                ${escapeHtml(m.message)}
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
-
-                document.getElementById('messagesContainer').innerHTML = messagesHtml;
-                scrollToBottom();
+            if (discussion) {
+                document.getElementById('chatSubject').textContent = discussion.subject;
+                renderLaporanMessages(discussion.messages);
 
                 if (discussion.messages.length > 0) {
-                    lastMessageId = discussion.messages[discussion.messages.length - 1].id;
+                    discussionManager.lastMessageId = discussion.messages[discussion.messages.length - 1].id;
                 }
-            } catch (error) {
-                console.error('Error loading messages:', error);
             }
+        }
+
+        function renderLaporanMessages(messages) {
+            const messagesHtml = messages.map(m => `
+        <div class="mb-4 flex ${m.user_id === discussionManager.userId ? 'justify-end' : 'justify-start'}">
+            <div class="max-w-[70%]">
+                <div class="mb-1 flex items-center gap-2 ${m.user_id === discussionManager.userId ? 'flex-row-reverse' : ''}">
+                    <span class="text-xs font-semibold text-gray-700">${m.user.name}</span>
+                    <span class="text-xs text-gray-400">${discussionManager.formatTime(m.created_at)}</span>
+                </div>
+                <div class="rounded-lg px-4 py-2 ${m.user_id === discussionManager.userId ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-800'}">
+                    ${discussionManager.escapeHtml(m.message)}
+                </div>
+            </div>
+        </div>
+    `).join('');
+
+            document.getElementById('chatMessages').innerHTML = messagesHtml;
+            scrollLaporanToBottom();
+        }
+
+        function appendLaporanMessages(newMessages) {
+            const container = document.getElementById('chatMessages');
+            if (!container || !discussionManager.getCurrentDiscussion()) return;
+
+            const messagesHtml = newMessages.map(m => `
+        <div class="mb-4 flex ${m.user_id === discussionManager.userId ? 'justify-end' : 'justify-start'}">
+            <div class="max-w-[70%]">
+                <div class="mb-1 flex items-center gap-2 ${m.user_id === discussionManager.userId ? 'flex-row-reverse' : ''}">
+                    <span class="text-xs font-semibold text-gray-700">${m.user.name}</span>
+                    <span class="text-xs text-gray-400">${discussionManager.formatTime(m.created_at)}</span>
+                </div>
+                <div class="rounded-lg px-4 py-2 ${m.user_id === discussionManager.userId ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-800'}">
+                    ${discussionManager.escapeHtml(m.message)}
+                </div>
+            </div>
+        </div>
+    `).join('');
+
+            container.insertAdjacentHTML('beforeend', messagesHtml);
+            scrollLaporanToBottom();
         }
 
         async function sendMessage() {
             const messageInput = document.getElementById('messageInput');
             const message = messageInput.value.trim();
 
-            if (!message || !currentDiscussionId) return;
+            if (!message || !discussionManager.getCurrentDiscussion()) return;
 
-            try {
-                const response = await fetch(`/discussions/${currentDiscussionId}/messages`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        message
-                    })
-                });
+            const result = await discussionManager.sendMessage(
+                discussionManager.getCurrentDiscussion(),
+                message
+            );
 
-                if (response.ok) {
-                    messageInput.value = '';
-                    await loadMessages();
-                    await loadDiscussions();
-                } else {
-                    showErrorModal('Gagal mengirim pesan');
-                }
-            } catch (error) {
-                console.error('Error sending message:', error);
-                showErrorModal('Terjadi kesalahan saat mengirim pesan');
+            if (result) {
+                messageInput.value = '';
             }
         }
 
@@ -760,137 +754,32 @@
             }
         }
 
-        function startPolling() {
-            pollingInterval = setInterval(async () => {
-                if (!currentDiscussionId) return;
+        function scrollLaporanToBottom() {
+            const container = document.getElementById('chatMessages');
+            if (container) {
+                container.scrollTop = container.scrollHeight;
+            }
+        }
 
-                try {
-                    const response = await fetch(
-                        `/discussions/${currentDiscussionId}/new-messages?last_message_id=${lastMessageId}`, {
-                            headers: {
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                'Accept': 'application/json'
-                            }
-                        });
-                    const newMessages = await response.json();
+        // ============================================
+        // EVENT LISTENERS
+        // ============================================
 
-                    if (newMessages.length > 0) {
-                        const container = document.getElementById('messagesContainer');
-                        const messagesHtml = newMessages.map(m => `
-                            <div class="mb-4 flex ${m.user_id === userId ? 'justify-end' : 'justify-start'}">
-                                <div class="max-w-[70%]">
-                                    <div class="mb-1 flex items-center gap-2 ${m.user_id === userId ? 'flex-row-reverse' : ''}">
-                                        <span class="text-xs font-semibold text-gray-700">${m.user.name}</span>
-                                        <span class="text-xs text-gray-400">${formatTime(m.created_at)}</span>
-                                    </div>
-                                    <div class="rounded-lg px-4 py-2 ${m.user_id === userId ? 'bg-amber-500 text-white' : 'bg-gray-100 text-gray-800'}">
-                                        ${escapeHtml(m.message)}
-                                    </div>
-                                </div>
-                            </div>
-                        `).join('');
+        // Close on outside click
+        document.getElementById('discussionModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDiscussion();
+            }
+        });
 
-                        container.insertAdjacentHTML('beforeend', messagesHtml);
-                        scrollToBottom();
-
-                        lastMessageId = newMessages[newMessages.length - 1].id;
-                        await loadDiscussions();
-                    }
-                } catch (error) {
-                    console.error('Error polling messages:', error);
+        // Close on Escape key (only if laporan modal is open)
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('discussionModal');
+                if (modal && !modal.classList.contains('hidden')) {
+                    closeDiscussion();
                 }
-            }, 3000); // Poll every 3 seconds
-        }
-
-        function stopPolling() {
-            if (pollingInterval) {
-                clearInterval(pollingInterval);
-                pollingInterval = null;
             }
-        }
-
-        async function loadUnreadCounts() {
-            try {
-                const response = await fetch('/discussions', {
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json'
-                    }
-                });
-                const allDiscussions = await response.json();
-
-                // Group by admin_id and count unread
-                const unreadByAdmin = {};
-                allDiscussions.forEach(d => {
-                    if (!unreadByAdmin[d.admin_id]) {
-                        unreadByAdmin[d.admin_id] = 0;
-                    }
-                    unreadByAdmin[d.admin_id] += d.unread_count || 0;
-                });
-
-                // Update badges
-                Object.keys(unreadByAdmin).forEach(adminId => {
-                    const badge = document.getElementById(`unread-badge-${adminId}`);
-                    if (badge) {
-                        const count = unreadByAdmin[adminId];
-                        if (count > 0) {
-                            badge.textContent = count > 9 ? '9+' : count;
-                            badge.classList.remove('hidden');
-                            badge.classList.add('flex');
-                        } else {
-                            badge.classList.add('hidden');
-                            badge.classList.remove('flex');
-                        }
-                    }
-                });
-            } catch (error) {
-                console.error('Error loading unread counts:', error);
-            }
-        }
-
-        function scrollToBottom() {
-            const container = document.getElementById('messagesContainer');
-            container.scrollTop = container.scrollHeight;
-        }
-
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            const now = new Date();
-            const diff = now - date;
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-
-            if (days === 0) {
-                return 'Hari ini';
-            } else if (days === 1) {
-                return 'Kemarin';
-            } else if (days < 7) {
-                return `${days} hari lalu`;
-            } else {
-                return date.toLocaleDateString('id-ID', {
-                    day: 'numeric',
-                    month: 'short',
-                    year: 'numeric'
-                });
-            }
-        }
-
-        function formatTime(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleTimeString('id-ID', {
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML.replace(/\n/g, '<br>');
-        }
-
-        // Cleanup on page unload
-        window.addEventListener('beforeunload', () => {
-            stopPolling();
         });
     </script>
 @endsection

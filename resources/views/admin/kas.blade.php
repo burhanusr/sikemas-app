@@ -737,7 +737,6 @@
                 }
             @endif
 
-            // Submit form on Enter key press in search input (optional - you can remove this if you don't want it)
             const searchInput = document.getElementById('searchInput');
             if (searchInput) {
                 searchInput.addEventListener('keypress', function(e) {
