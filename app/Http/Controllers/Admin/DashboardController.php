@@ -22,10 +22,10 @@ class DashboardController extends Controller
         $endDate = $request->get('end_date', now()->format('Y-m-d'));
 
         // Calculate current balance (saldo masjid)
-        $saldoMasjid = Kas::where('user_id', $userId)
-            ->latest('tanggal')
-            ->latest('id')
-            ->value('saldo') ?? 0;
+        // $saldoMasjid = Kas::where('user_id', $userId)
+        //     ->latest('tanggal')
+        //     ->latest('id')
+        //     ->value('saldo') ?? 0;
 
         // Get total income for current month
         $totalPemasukan = Kas::where('user_id', $userId)
@@ -67,7 +67,6 @@ class DashboardController extends Controller
             ->get();
 
         return view('admin.dashboard', compact(
-            'saldoMasjid',
             'totalPemasukan',
             'jumlahTransaksiPemasukan',
             'totalPengeluaran',

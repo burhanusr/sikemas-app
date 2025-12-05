@@ -19,7 +19,7 @@
         <!-- Financial Stats Grid -->
         <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
             <!-- Saldo Masjid -->
-            <div class="rounded-xl border border-green-100 bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
+            {{-- <div class="rounded-xl border border-green-100 bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-500">Saldo Masjid</p>
@@ -44,7 +44,7 @@
                         </svg>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             <!-- Pemasukan Masjid -->
             <div class="rounded-xl border border-green-100 bg-white p-6 shadow-sm transition-shadow hover:shadow-md">

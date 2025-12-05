@@ -109,6 +109,17 @@
 
                     <!-- Laporan Dropdown -->
                     <li>
+                        <a href="{{ route('kas.index') }}"
+                            class="{{ request()->routeIs('kas.index') ? 'bg-gradient-to-r from-green-50 to-emerald-50 text-green-600 font-medium' : '' }} flex items-center rounded-lg px-4 py-3 text-gray-700 transition-all hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 hover:text-green-600">
+                            <svg class="h-6 w-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                            </svg>
+                            <span class="sidebar-text ml-3 font-medium">Aktivitas Keuangan</span>
+                        </a>
+                    </li>
+
+                    {{-- <li>
                         <button onclick="toggleDropdown('laporanDropdown')"
                             class="flex w-full items-center justify-between rounded-lg px-4 py-3 text-gray-700 transition-all hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 hover:text-green-600">
                             <div class="flex items-center">
@@ -160,7 +171,7 @@
                                 </a>
                             </li>
                         </ul>
-                    </li>
+                    </li> --}}
                 @endif
             </ul>
         </nav>

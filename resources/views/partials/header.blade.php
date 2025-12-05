@@ -103,7 +103,7 @@
         <div class="flex flex-1 overflow-hidden">
             <!-- Discussion List -->
             <div class="w-1/3 rounded-bl-xl border-r border-gray-200 bg-gray-50">
-                <div class="border-b border-gray-200 p-4">
+                {{-- <div class="border-b border-gray-200 p-4">
                     <button onclick="showHeaderNewDiscussionForm()"
                         class="w-full rounded-lg bg-green-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-600">
                         <svg class="mr-2 inline-block h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -111,9 +111,9 @@
                         </svg>
                         Diskusi Baru
                     </button>
-                </div>
+                </div> --}}
                 <div id="headerDiscussionList" class="overflow-y-auto" style="height: calc(90vh - 170px);">
-                    <div class="p-4 text-center text-sm text-gray-500">
+                    <div class="h-full p-4 text-center text-sm text-gray-500">
                         Memuat diskusi...
                     </div>
                 </div>
@@ -262,7 +262,7 @@
     `).join('');
 
         document.getElementById('headerDiscussionList').innerHTML = listHtml ||
-            '<div class="p-4 text-center text-sm text-gray-500">Belum ada diskusi</div>';
+            '<div class="p-4 h-full justify-center flex items-center text-sm text-gray-500">Belum ada diskusi</div>';
     }
 
     // ============================================

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\KasExport;
 use App\Http\Controllers\Controller;
 use App\Models\Kas;
 use App\Models\KodeAkun;
@@ -10,6 +11,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class KasController extends Controller
 {
@@ -50,7 +52,11 @@ class KasController extends Controller
 
         $kas = $query->latest('tanggal')->latest('id')->paginate(10)->withQueryString();
 
-        return view('admin.log-keuangan', compact('kas', 'user'));
+        $totalPemasukan = Kas::where('user_id', $userId)->where('jenis', 'pemasukan')->sum('nominal');
+        $totalPengeluaran = Kas::where('user_id', $userId)->where('jenis', 'pengeluaran')->sum('nominal');
+        $saldo = $totalPemasukan - $totalPengeluaran;
+
+        return view('admin.log-keuangan', compact('kas', 'user', 'saldo', 'totalPemasukan', 'totalPengeluaran'));
     }
 
     public function getKasByType(Request $request, $jenis)
@@ -113,22 +119,12 @@ class KasController extends Controller
         }
 
         DB::transaction(function () use ($request, $jenis, $userId) {
-            $lastSaldo = Kas::where('user_id', $userId)
-                ->latest('tanggal')
-                ->latest('id')
-                ->value('saldo') ?? 0;
-
-            $saldo = $jenis === 'pemasukan'
-                ? $lastSaldo + $request->nominal
-                : $lastSaldo - $request->nominal;
-
             $kas = Kas::create([
                 'user_id' => $userId,
                 'tanggal' => $request->tanggal,
                 'kodeakun_id' => $request->kodeakun_id,
                 'jenis' => $jenis,
                 'nominal' => $request->nominal,
-                'saldo' => $saldo,
                 'keterangan' => $request->keterangan,
             ]);
 
@@ -164,20 +160,12 @@ class KasController extends Controller
         }
 
         DB::transaction(function () use ($kas, $request, $jenis) {
-            $selisih = $jenis === 'pemasukan'
-                ? $request->nominal - $kas->nominal
-                : $kas->nominal - $request->nominal;
-
             $kas->update([
                 'tanggal' => $request->tanggal,
                 'kodeakun_id' => $request->kodeakun_id,
                 'nominal' => $request->nominal,
                 'keterangan' => $request->keterangan,
             ]);
-
-            Kas::where('user_id', $kas->user_id)
-                ->where('id', '>', $kas->id)
-                ->increment('saldo', $selisih);
 
             // Update jurnal umum
             $this->updateJurnalEntry($kas);
@@ -202,13 +190,7 @@ class KasController extends Controller
 
         $jenis = $kas->jenis;
 
-        DB::transaction(function () use ($kas, $jenis) {
-            $selisih = $jenis === 'pemasukan' ? -$kas->nominal : $kas->nominal;
-
-            Kas::where('user_id', $kas->user_id)
-                ->where('id', '>', $kas->id)
-                ->increment('saldo', $selisih);
-
+        DB::transaction(function () use ($kas) {
             $kas->delete();
         });
 
@@ -280,5 +262,16 @@ class KasController extends Controller
         }
 
         return Auth::id();
+    }
+
+    public function export(Request $request)
+    {
+        $userId = $this->getUserId($request);
+        $month = $request->get('month', now()->month);
+        $year = $request->get('year', now()->year);
+
+        $fileName = 'Laporan_Kas_' . \Carbon\Carbon::create($year, $month)->format('F_Y') . '.xlsx';
+
+        return Excel::download(new KasExport($month, $year, $userId), $fileName);
     }
 }

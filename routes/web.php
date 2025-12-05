@@ -1,5 +1,6 @@
 <?php
 
+use App\Exports\KasExport;
 use App\Http\Controllers\Admin\BukuBesarController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\DiscussionController;
 use App\Http\Controllers\SuperAdmin\LaporanKeuanganController;
 use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboardController;
 use App\Http\Controllers\SuperAdmin\UserController;
+use Maatwebsite\Excel\Facades\Excel;
 
 // Guest routes
 Route::middleware('guest')->group(function () {
@@ -51,6 +53,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/discussions/{id}/new-messages', [DiscussionController::class, 'getNewMessages'])->name('discussions.newMessages');
         Route::patch('/discussions/{id}/close', [DiscussionController::class, 'close'])->name('discussions.close');
         Route::patch('/discussions/{id}/reopen', [DiscussionController::class, 'reopen'])->name('discussions.reopen');
+
+        Route::get('/kas/export', [KasController::class, 'export'])->name('kas.export');
     });
 
     // SuperAdmin routes

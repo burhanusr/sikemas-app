@@ -48,14 +48,85 @@
                     <p class="mt-1 text-gray-600">Riwayat semua transaksi keuangan yang telah dilakukan</p>
                 </div>
                 <div class="flex items-center gap-2">
+                    <!-- Export Button -->
+                    <button onclick="openExportModal()"
+                        class="inline-flex items-center gap-2 rounded-lg bg-green-500 px-4 py-2 text-sm font-medium text-white shadow transition hover:bg-green-600">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Export Excel
+                    </button>
+
                     <span
-                        class="inline-flex items-center rounded-lg bg-blue-50 px-3 py-2 text-sm font-medium text-blue-700">
+                        class="inline-flex items-center rounded-lg bg-green-50 px-3 py-2 text-sm font-medium text-green-700">
                         <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                         Total: {{ $kas->total() }} Transaksi
                     </span>
+                </div>
+            </div>
+
+            <!-- Balance Information Card -->
+            <div class="rounded-xl border border-green-200 bg-gradient-to-br from-green-50 to-indigo-50 p-6 shadow-sm">
+                <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div class="flex items-center gap-4">
+                        <div class="flex h-14 w-14 items-center justify-center rounded-full bg-green-500 shadow-lg">
+                            <svg class="h-7 w-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Saldo Saat Ini</p>
+                            <p class="text-3xl font-bold text-green-600">
+                                Rp {{ number_format($saldo ?? 0, 0, ',', '.') }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Summary Statistics -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <!-- Total Pemasukan -->
+                        <div class="rounded-lg bg-white p-4 shadow-sm">
+                            <div class="flex items-center gap-2">
+                                <div class="rounded-full bg-green-100 p-2">
+                                    <svg class="h-4 w-4 text-green-600" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M7 11l5-5m0 0l5 5m-5-5v12" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500">Total Pemasukan</p>
+                                    <p class="text-sm font-bold text-green-600">
+                                        Rp {{ number_format($totalPemasukan ?? 0, 0, ',', '.') }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Total Pengeluaran -->
+                        <div class="rounded-lg bg-white p-4 shadow-sm">
+                            <div class="flex items-center gap-2">
+                                <div class="rounded-full bg-orange-100 p-2">
+                                    <svg class="h-4 w-4 text-orange-600" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M17 13l-5 5m0 0l-5-5m5 5V6" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500">Total Pengeluaran</p>
+                                    <p class="text-sm font-bold text-orange-600">
+                                        Rp {{ number_format($totalPengeluaran ?? 0, 0, ',', '.') }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -75,7 +146,8 @@
                                 <div class="flex-1">
                                     <div class="relative">
                                         <input type="text" name="search" id="searchInput"
-                                            value="{{ request('search') }}" placeholder="Cari nama akun atau keterangan..."
+                                            value="{{ request('search') }}"
+                                            placeholder="Cari nama akun atau keterangan..."
                                             class="w-full rounded-lg border border-blue-200 py-2 pl-10 pr-4 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500">
                                         <svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none"
                                             stroke="currentColor" viewBox="0 0 24 24">
@@ -93,8 +165,7 @@
                                         <option value="pemasukan" {{ request('jenis') == 'pemasukan' ? 'selected' : '' }}>
                                             Pemasukan</option>
                                         <option value="pengeluaran"
-                                            {{ request('jenis') == 'pengeluaran' ? 'selected' : '' }}>
-                                            Pengeluaran</option>
+                                            {{ request('jenis') == 'pengeluaran' ? 'selected' : '' }}>Pengeluaran</option>
                                     </select>
                                 </div>
                             </div>
@@ -225,9 +296,6 @@
                                     class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
                                     Nominal</th>
                                 <th
-                                    class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
-                                    Saldo</th>
-                                <th
                                     class="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">
                                     Aksi</th>
                             </tr>
@@ -283,9 +351,6 @@
                                             {{ number_format($item->nominal, 0, ',', '.') }}
                                         </span>
                                     </td>
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm font-semibold text-blue-600">
-                                        Rp {{ number_format($item->saldo, 0, ',', '.') }}
-                                    </td>
                                     <td class="whitespace-nowrap px-6 py-4 text-center">
                                         <button onclick='openDetailModal(@json($item))'
                                             class="inline-flex items-center rounded-lg bg-purple-500 px-3 py-1.5 text-sm font-medium text-white transition-all hover:bg-purple-600 hover:shadow-md">
@@ -301,7 +366,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="9" class="px-6 py-12 text-center">
+                                    <td colspan="8" class="px-6 py-12 text-center">
                                         <svg class="mx-auto mb-4 h-16 w-16 text-gray-300" fill="none"
                                             stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -334,6 +399,76 @@
                     </div>
                 @endif
             </div>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div id="exportModal"
+        class="modal-overlay fixed inset-0 z-50 hidden items-center justify-center bg-black/30 p-4 backdrop-blur-sm">
+        <div class="modal-content w-full max-w-md transform rounded-xl bg-white shadow-2xl"
+            onclick="event.stopPropagation()">
+            <div class="rounded-t-xl bg-gradient-to-r from-green-500 to-green-600 px-6 py-5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-xl font-bold text-white">Export Laporan Excel</h3>
+                        <p class="mt-1 text-green-50">Pilih bulan dan tahun untuk export</p>
+                    </div>
+                    <button onclick="closeExportModal()" class="text-white transition-colors hover:text-gray-200">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <form method="GET" action="{{ route('kas.export') }}" class="p-6">
+                @if (isset($user) && $user->id !== Auth::id())
+                    <input type="hidden" name="user_id" value="{{ $user->id }}">
+                @endif
+
+                <div class="space-y-4">
+                    <!-- Month Selection -->
+                    <div>
+                        <label for="export_month" class="mb-2 block text-sm font-medium text-gray-700">Bulan</label>
+                        <select name="month" id="export_month"
+                            class="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500">
+                            @foreach (range(1, 12) as $m)
+                                <option value="{{ $m }}" {{ $m == now()->month ? 'selected' : '' }}>
+                                    {{ \Carbon\Carbon::create(null, $m, 1)->translatedFormat('F') }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Year Selection -->
+                    <div>
+                        <label for="export_year" class="mb-2 block text-sm font-medium text-gray-700">Tahun</label>
+                        <select name="year" id="export_year"
+                            class="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500">
+                            @foreach (range(now()->year - 5, now()->year + 1) as $y)
+                                <option value="{{ $y }}" {{ $y == now()->year ? 'selected' : '' }}>
+                                    {{ $y }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex gap-3">
+                    <button type="button" onclick="closeExportModal()"
+                        class="flex-1 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
+                        Batal
+                    </button>
+                    <button type="submit"
+                        class="flex-1 rounded-lg bg-gradient-to-r from-green-500 to-green-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:from-green-600 hover:to-green-700">
+                        <svg class="mr-2 inline h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Export
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -371,29 +506,16 @@
                         <p id="detail_jenis" class="font-semibold text-gray-900"></p>
                     </div>
 
-                    <!-- Date & Account Name -->
-                    <div class="grid gap-4 md:grid-cols-2">
-                        <div class="rounded-lg border border-gray-200 bg-gray-50 p-3">
-                            <label class="mb-1 flex items-center gap-1.5 text-xs font-medium text-gray-500">
-                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                Nominal
-                            </label>
-                            <p id="detail_nominal" class="text-lg font-bold"></p>
-                        </div>
-
-                        <div class="rounded-lg border border-blue-200 bg-blue-50 p-3">
-                            <label class="mb-1 flex items-center gap-1.5 text-xs font-medium text-blue-700">
-                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                                </svg>
-                                Saldo
-                            </label>
-                            <p id="detail_saldo" class="text-lg font-bold text-blue-600"></p>
-                        </div>
+                    <!-- Nominal -->
+                    <div class="rounded-lg border border-gray-200 bg-gray-50 p-3">
+                        <label class="mb-1 flex items-center gap-1.5 text-xs font-medium text-gray-500">
+                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Nominal
+                        </label>
+                        <p id="detail_nominal" class="text-lg font-bold"></p>
                     </div>
 
                     <!-- Description -->
@@ -446,7 +568,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Submit form on Enter key press in search input
             const searchInput = document.getElementById('searchInput');
             if (searchInput) {
                 searchInput.addEventListener('keypress', function(e) {
@@ -457,20 +578,24 @@
                 });
             }
 
-            // Close modal when clicking overlay
             const detailModal = document.getElementById('detailModal');
             if (detailModal) {
                 detailModal.addEventListener('click', function(e) {
-                    if (e.target === this) {
-                        closeDetailModal();
-                    }
+                    if (e.target === this) closeDetailModal();
                 });
             }
 
-            // Close modal with ESC key
+            const exportModal = document.getElementById('exportModal');
+            if (exportModal) {
+                exportModal.addEventListener('click', function(e) {
+                    if (e.target === this) closeExportModal();
+                });
+            }
+
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     closeDetailModal();
+                    closeExportModal();
                 }
             });
         });
@@ -479,8 +604,21 @@
             return 'Rp ' + new Intl.NumberFormat('id-ID').format(number);
         }
 
+        function openExportModal() {
+            const modal = document.getElementById('exportModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeExportModal() {
+            const modal = document.getElementById('exportModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+
         function openDetailModal(item) {
-            // Set transaction jenis
             const jenisContainer = document.getElementById('detail_jenis');
             if (item.jenis == 'pemasukan') {
                 jenisContainer.innerHTML =
@@ -490,35 +628,15 @@
                     '<span class="inline-flex items-center rounded-full bg-gradient-to-r from-orange-100 to-orange-100 px-3 py-1.5 text-sm font-semibold text-orange-700"><svg class="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6" /></svg>Pengeluaran</span>';
             }
 
-            // Set date and account name
-            document.getElementById('detail_tanggal').textContent = new Date(item.tanggal).toLocaleDateString('id-ID', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric'
-            });
-            document.getElementById('detail_nama').textContent = item.kode_akun.nama_akun;
-            document.getElementById('detail_kode_akun').textContent = item.kode_akun ?
-                `${item.kode_akun.kode_akun} - ${item.kode_akun.nama_akun}` : '-';
-
-            // Set nominal with color styling
-            const nominalContainer = document.getElementById('detail_nominal_container');
             const nominalElement = document.getElementById('detail_nominal');
             if (item.jenis == 'pemasukan') {
-                nominalContainer.className = 'rounded-lg border border-green-200 bg-green-50 p-3';
-                nominalContainer.querySelector('label').className =
-                    'mb-1 flex items-center gap-1.5 text-xs font-medium text-green-700';
                 nominalElement.className = 'text-lg font-bold text-green-600';
                 nominalElement.textContent = '+ ' + formatRupiah(item.nominal);
             } else {
-                nominalContainer.className = 'rounded-lg border border-orange-200 bg-orange-50 p-3';
-                nominalContainer.querySelector('label').className =
-                    'mb-1 flex items-center gap-1.5 text-xs font-medium text-orange-700';
                 nominalElement.className = 'text-lg font-bold text-orange-600';
                 nominalElement.textContent = '- ' + formatRupiah(item.nominal);
             }
 
-            // Set other fields
-            document.getElementById('detail_saldo').textContent = formatRupiah(item.saldo);
             document.getElementById('detail_keterangan').textContent = item.keterangan || '-';
             document.getElementById('detail_created').textContent = new Date(item.created_at).toLocaleString('id-ID');
             document.getElementById('detail_updated').textContent = new Date(item.updated_at).toLocaleString('id-ID');

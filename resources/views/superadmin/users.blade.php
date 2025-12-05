@@ -650,7 +650,7 @@
             const form = document.getElementById('editForm');
 
             // Set form action with proper route
-            form.action = "{{ url('admin/users') }}/" + user.id;
+            form.action = "{{ url('users') }}/" + user.id;
 
             // Populate form fields
             document.getElementById('edit_name').value = user.name;
@@ -693,7 +693,7 @@
             const form = document.getElementById('deleteForm');
 
             // Set form action with proper route
-            form.action = "{{ url('admin/users') }}/" + id;
+            form.action = "{{ url('users') }}/" + id;
 
             // Set display text
             document.getElementById('delete_name_display').textContent = name;

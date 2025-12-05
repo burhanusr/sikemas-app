@@ -19,7 +19,6 @@ return new class extends Migration
             $table->enum('jenis', ['pemasukan', 'pengeluaran']);
             $table->decimal('nominal', 15, 0);
             $table->text('keterangan')->nullable();
-            $table->decimal('saldo', 15, 0)->nullable()->comment('Saldo kas setelah transaksi ini (dihitung otomatis)');
             $table->timestamps();
         });
     }
