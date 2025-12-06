@@ -13,11 +13,7 @@ class LaporanKeuanganController extends Controller
     public function index(Request $request)
     {
         $query = User::where('role', 'admin')
-            ->select('users.*')
-            ->leftJoin('kas', function ($join) {
-                $join->on('users.id', '=', 'kas.user_id')
-                    ->whereRaw('kas.id = (SELECT MAX(id) FROM kas WHERE kas.user_id = users.id)');
-            });
+            ->select('users.*');
 
         // Search filter
         if ($request->filled('search')) {
@@ -32,6 +28,22 @@ class LaporanKeuanganController extends Controller
         $mosques = $query->orderBy('users.organization')
             ->paginate(15)
             ->withQueryString();
+
+        // Calculate saldo for each mosque
+        foreach ($mosques as $mosque) {
+            // Get total pemasukan
+            $totalPemasukan = Kas::where('user_id', $mosque->id)
+                ->where('jenis', 'pemasukan')
+                ->sum('nominal');
+
+            // Get total pengeluaran
+            $totalPengeluaran = Kas::where('user_id', $mosque->id)
+                ->where('jenis', 'pengeluaran')
+                ->sum('nominal');
+
+            // Calculate saldo
+            $mosque->saldo = $totalPemasukan - $totalPengeluaran;
+        }
 
         return view('superadmin.laporan-keuangan', compact('mosques'));
     }

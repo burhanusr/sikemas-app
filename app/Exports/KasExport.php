@@ -123,6 +123,14 @@ class KasExport implements FromView, WithStyles, WithColumnWidths, WithEvents
                 // Get the last row
                 $lastRow = $sheet->getHighestRow();
 
+                // Set white background for all data cells
+                $sheet->getStyle('A4:F' . $lastRow)->applyFromArray([
+                    'fill' => [
+                        'fillType' => Fill::FILL_SOLID,
+                        'startColor' => ['rgb' => 'FFFFFF'],
+                    ],
+                ]);
+
                 // Style all borders
                 $sheet->getStyle('A4:F' . $lastRow)->applyFromArray([
                     'borders' => [
@@ -142,27 +150,42 @@ class KasExport implements FromView, WithStyles, WithColumnWidths, WithEvents
                     ],
                 ]);
 
-                // Center align certain columns
-                $sheet->getStyle('A4:A' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-                $sheet->getStyle('B4:B' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                // Center align certain columns for data rows only
+                $sheet->getStyle('A5:A' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('B5:B' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
                 // Format numbers with thousand separator
                 $sheet->getStyle('E5:F' . $lastRow)->getNumberFormat()->setFormatCode('#,##0');
 
-                // Bold section headers and totals
+                // Bold and left-align section headers and totals
                 foreach ($sheet->getRowIterator() as $row) {
-                    $cellValue = $sheet->getCell('A' . $row->getRowIndex())->getValue();
+                    $rowIndex = $row->getRowIndex();
+                    $cellValue = $sheet->getCell('A' . $rowIndex)->getValue();
+
+                    // Check if this is a section header or total row
                     if (
-                        in_array($cellValue, ['Saldo Masjid', 'Pemasukan', 'Pengeluaran', 'Saldo Akhir']) ||
-                        strpos($cellValue, 'Total') === 0
+                        $cellValue === 'Saldo Masjid' ||
+                        strpos($cellValue, 'Total Saldo per') === 0 ||
+                        $cellValue === 'Pemasukan' ||
+                        $cellValue === 'Total Pemasukan' ||
+                        $cellValue === 'Pengeluaran' ||
+                        $cellValue === 'Total Pengeluaran' ||
+                        $cellValue === 'Saldo Akhir'
                     ) {
-                        $sheet->getStyle('A' . $row->getRowIndex() . ':F' . $row->getRowIndex())->applyFromArray([
+                        // Make bold
+                        $sheet->getStyle('A' . $rowIndex . ':F' . $rowIndex)->applyFromArray([
                             'font' => ['bold' => true],
                             'fill' => [
                                 'fillType' => Fill::FILL_SOLID,
-                                'startColor' => ['rgb' => 'F0F0F0'],
+                                'startColor' => ['rgb' => 'FFFFFF'], // White background
                             ],
                         ]);
+
+                        // Left align the text in column A for these rows
+                        $sheet->getStyle('A' . $rowIndex)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+
+                        // Also left align merged cells if they span across
+                        $sheet->getStyle('A' . $rowIndex . ':D' . $rowIndex)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
                     }
                 }
             },
