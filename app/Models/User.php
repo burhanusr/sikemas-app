@@ -48,13 +48,35 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * Check if user is super admin
+     */
     public function isSuperAdmin(): bool
     {
         return $this->role === 'superadmin';
     }
 
+    /**
+     * Check if user is admin
+     */
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
+    }
+
+    /**
+     * Get all kas entries for this user
+     */
+    public function kas()
+    {
+        return $this->hasMany(Kas::class);
+    }
+
+    /**
+     * Get all kode akun for this user
+     */
+    public function kodeAkun()
+    {
+        return $this->hasMany(KodeAkun::class);
     }
 }

@@ -12,7 +12,6 @@
                     <h2 class="mb-2 text-2xl font-bold text-white">Selamat datang, {{ Auth::user()->name }}!</h2>
                     <p class="text-white/90">Anda memiliki akses penuh ke seluruh fitur sistem.</p>
                 </div>
-
             </div>
         </div>
 
@@ -30,7 +29,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                 </svg>
-                                Semua Role
+                                Pengguna
                             </span>
                         </p>
                     </div>
@@ -97,21 +96,33 @@
             </div>
         </div>
 
-        <!-- Financial Overview Chart -->
+        <!-- Admin Comparison Chart -->
         <div class="rounded-xl border border-purple-100 bg-white p-6 shadow-sm">
             <div class="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
-                <h3 class="text-lg font-semibold text-gray-800">Grafik Pemasukan & Pengeluaran Semua Masjid</h3>
+                <h3 class="text-lg font-semibold text-gray-800">Grafik {{ ucfirst($transactionType ?? 'Pemasukan') }} Per
+                    Masjid (Januari - Desember {{ $year ?? now()->year }})</h3>
                 <div class="flex flex-wrap gap-3">
                     <div class="flex items-center gap-2">
-                        <label for="startDate" class="text-sm font-medium text-gray-600">Dari:</label>
-                        <input type="date" id="startDate"
-                            value="{{ $startDate ?? now()->startOfMonth()->format('Y-m-d') }}"
+                        <label for="transactionType" class="text-sm font-medium text-gray-600">Jenis:</label>
+                        <select id="transactionType"
                             class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20">
+                            <option value="pemasukan"
+                                {{ ($transactionType ?? 'pemasukan') == 'pemasukan' ? 'selected' : '' }}>Pemasukan</option>
+                            <option value="pengeluaran"
+                                {{ ($transactionType ?? 'pemasukan') == 'pengeluaran' ? 'selected' : '' }}>Pengeluaran
+                            </option>
+                        </select>
                     </div>
                     <div class="flex items-center gap-2">
-                        <label for="endDate" class="text-sm font-medium text-gray-600">Sampai:</label>
-                        <input type="date" id="endDate" value="{{ $endDate ?? now()->format('Y-m-d') }}"
+                        <label for="year" class="text-sm font-medium text-gray-600">Tahun:</label>
+                        <select id="year"
                             class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20">
+                            @foreach ($availableYears as $availableYear)
+                                <option value="{{ $availableYear }}" {{ $year == $availableYear ? 'selected' : '' }}>
+                                    {{ $availableYear }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
                     <button onclick="updateChart()"
                         class="rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:from-purple-700 hover:to-indigo-700">
@@ -124,7 +135,7 @@
                 </div>
             </div>
             <div id="chartWrapper" style="width: 100%; height: 400px; position: relative; overflow: hidden;">
-                <canvas id="financialChart"></canvas>
+                <canvas id="adminChart"></canvas>
             </div>
         </div>
 
@@ -239,29 +250,47 @@
             </div>
         </div>
 
-        <!-- Super Admin Controls -->
+        <!-- Admin Data Table -->
         <div class="rounded-xl border border-purple-100 bg-white p-6 shadow-sm">
-            <h3 class="mb-6 text-lg font-semibold text-gray-800">Kontrol Super Admin</h3>
-            <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <a href="{{ route('users.index') }}"
-                    class="transform rounded-xl bg-gradient-to-br from-purple-600 to-purple-700 p-6 text-left text-white shadow-md transition-all hover:scale-105 hover:from-purple-700 hover:to-purple-800 hover:shadow-lg">
-                    <svg class="mb-3 h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg>
-                    <h4 class="mb-2 text-lg font-semibold">Kelola Semua Pengguna</h4>
-                    <p class="text-sm text-purple-100">Kontrol penuh atas semua akun pengguna</p>
-                </a>
-
-                <a href="{{ route('users.store') }}"
-                    class="transform rounded-xl bg-gradient-to-br from-indigo-600 to-indigo-700 p-6 text-left text-white shadow-md transition-all hover:scale-105 hover:from-indigo-700 hover:to-indigo-800 hover:shadow-lg">
-                    <svg class="mb-3 h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                    </svg>
-                    <h4 class="mb-2 text-lg font-semibold">Tambah Admin</h4>
-                    <p class="text-sm text-indigo-100">Buat akun administrator baru</p>
-                </a>
+            <h3 class="mb-4 text-lg font-semibold text-gray-800">Detail {{ ucfirst($transactionType ?? 'Pemasukan') }}
+                Admin Tahun {{ $year ?? now()->year }}</h3>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">No
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Nama
+                                Admin</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                                Organisasi</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
+                                Total {{ ucfirst($transactionType ?? 'Pemasukan') }}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 bg-white">
+                        @forelse($adminData ?? [] as $index => $admin)
+                            <tr class="hover:bg-gray-50">
+                                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900">{{ $index + 1 }}</td>
+                                <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
+                                    {{ $admin['name'] }}</td>
+                                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">{{ $admin['organization'] }}
+                                </td>
+                                <td
+                                    class="{{ ($transactionType ?? 'pemasukan') == 'pemasukan' ? 'text-blue-600' : 'text-orange-600' }} whitespace-nowrap px-6 py-4 text-right text-sm font-semibold">
+                                    Rp {{ number_format($admin['total'], 0, ',', '.') }}
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="px-6 py-8 text-center text-sm text-gray-500">
+                                    Tidak ada data tersedia
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -273,10 +302,10 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Chart data from controller
-            const chartData = @json($chartData ?? ['labels' => [], 'pemasukan' => [], 'pengeluaran' => []]);
+            const chartData = @json($chartData ?? ['labels' => [], 'datasets' => [], 'type' => 'pemasukan']);
 
             // Get canvas element
-            const canvasElement = document.getElementById('financialChart');
+            const canvasElement = document.getElementById('adminChart');
             const wrapper = document.getElementById('chartWrapper');
 
             if (canvasElement && typeof Chart !== 'undefined') {
@@ -292,43 +321,15 @@
                 const ctx = canvasElement.getContext('2d');
 
                 // Destroy existing chart if it exists
-                if (window.financialChartInstance) {
-                    window.financialChartInstance.destroy();
+                if (window.adminChartInstance) {
+                    window.adminChartInstance.destroy();
                 }
 
-                window.financialChartInstance = new Chart(ctx, {
+                window.adminChartInstance = new Chart(ctx, {
                     type: 'line',
                     data: {
                         labels: chartData.labels || [],
-                        datasets: [{
-                                label: 'Pemasukan',
-                                data: chartData.pemasukan || [],
-                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                                borderColor: 'rgb(59, 130, 246)',
-                                borderWidth: 3,
-                                fill: true,
-                                tension: 0.4,
-                                pointBackgroundColor: 'rgb(59, 130, 246)',
-                                pointBorderColor: '#fff',
-                                pointBorderWidth: 2,
-                                pointRadius: 5,
-                                pointHoverRadius: 7
-                            },
-                            {
-                                label: 'Pengeluaran',
-                                data: chartData.pengeluaran || [],
-                                backgroundColor: 'rgba(249, 115, 22, 0.1)',
-                                borderColor: 'rgb(249, 115, 22)',
-                                borderWidth: 3,
-                                fill: true,
-                                tension: 0.4,
-                                pointBackgroundColor: 'rgb(249, 115, 22)',
-                                pointBorderColor: '#fff',
-                                pointBorderWidth: 2,
-                                pointRadius: 5,
-                                pointHoverRadius: 7
-                            }
-                        ]
+                        datasets: chartData.datasets || []
                     },
                     options: {
                         responsive: false,
@@ -345,7 +346,7 @@
                                     usePointStyle: true,
                                     padding: 15,
                                     font: {
-                                        size: 12,
+                                        size: 11,
                                         weight: '600'
                                     }
                                 }
@@ -393,7 +394,7 @@
                 window.addEventListener('resize', function() {
                     clearTimeout(resizeTimeout);
                     resizeTimeout = setTimeout(function() {
-                        if (window.financialChartInstance) {
+                        if (window.adminChartInstance) {
                             const newWidth = wrapper.offsetWidth;
                             const newHeight = wrapper.offsetHeight;
 
@@ -402,7 +403,7 @@
                             canvasElement.style.width = newWidth + 'px';
                             canvasElement.style.height = newHeight + 'px';
 
-                            window.financialChartInstance.resize();
+                            window.adminChartInstance.resize();
                         }
                     }, 250);
                 });
@@ -411,15 +412,15 @@
 
         // Update chart function
         function updateChart() {
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
+            const year = document.getElementById('year').value;
+            const transactionType = document.getElementById('transactionType').value;
 
-            if (!startDate || !endDate) {
-                alert('Silakan pilih tanggal mulai dan tanggal akhir');
+            if (!year) {
+                alert('Silakan pilih tahun');
                 return;
             }
 
-            window.location.href = `{{ route('superadmin.dashboard') }}?start_date=${startDate}&end_date=${endDate}`;
+            window.location.href = `{{ route('superadmin.dashboard') }}?year=${year}&transaction_type=${transactionType}`;
         }
     </script>
 @endsection

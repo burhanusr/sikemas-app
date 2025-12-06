@@ -3,8 +3,9 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use App\Models\Kas;
+use App\Models\User;
+use App\Models\KodeAkun;
 use Carbon\Carbon;
 
 class KasSeeder extends Seeder
@@ -14,43 +15,140 @@ class KasSeeder extends Seeder
      */
     public function run(): void
     {
-        // Ambil beberapa user dan kodeakun
-        $userIds = DB::table('users')->pluck('id')->toArray();
-        $kodeAkunIds = DB::table('kode_akun')->pluck('id')->toArray();
+        // Get all admin users
+        $adminUsers = User::where('role', 'admin')->get();
 
-        if (empty($userIds) || empty($kodeAkunIds)) {
-            $this->command->warn('Seeder Kas: users or kode_akun is empty, skipping.');
+        if ($adminUsers->isEmpty()) {
+            $this->command->warn('No admin users found. Please run UserSeeder first.');
             return;
         }
 
-        $jenis = ['pemasukan', 'pengeluaran'];
+        // Sample account codes categories
+        $pemasukanCategories = [
+            'Infaq Jumat',
+            'Donasi',
+            'Zakat',
+            'Sumbangan',
+            'Infaq Ramadan',
+        ];
 
-        $saldo = 0;
+        $pengeluaranCategories = [
+            'Listrik',
+            'Air',
+            'Kebersihan',
+            'Pemeliharaan',
+            'Kegiatan',
+            'Gaji Imam',
+            'Gaji Muadzin',
+            'ATK',
+        ];
 
-        for ($i = 1; $i <= 20; $i++) {
-            // $randomUser = $userIds[array_rand($userIds)];
-            $randomKodeAkun = $kodeAkunIds[array_rand($kodeAkunIds)];
-            $randomJenis = $jenis[array_rand($jenis)];
-            $randomNominal = rand(100000, 1000000);
+        foreach ($adminUsers as $admin) {
+            // Get or create kode akun for this user
+            $kodeAkunPemasukan = [];
+            $kodeAkunPengeluaran = [];
 
-            // Hitung saldo otomatis
-            if ($randomJenis === 'pemasukan') {
-                $saldo += $randomNominal;
-            } else {
-                $saldo -= $randomNominal;
+            // Create kode akun for pemasukan
+            foreach ($pemasukanCategories as $index => $category) {
+                $kodeAkun = KodeAkun::firstOrCreate(
+                    [
+                        'user_id' => $admin->id,
+                        'kode_akun' => '4-10' . ($index + 1),
+                    ],
+                    [
+                        'nama_akun' => $category,
+                        'kategori_akun' => 'Pemasukan',
+                    ]
+                );
+                $kodeAkunPemasukan[] = $kodeAkun;
             }
 
-            DB::table('kas')->insert([
-                'user_id' => 2,
-                'kodeakun_id' => $randomKodeAkun,
-                'tanggal' => Carbon::now()->subDays(rand(0, 30))->format('Y-m-d'),
-                'jenis' => $randomJenis,
-                'nominal' => $randomNominal,
-                'keterangan' => 'Transaksi dummy #' . $i,
-                'saldo' => $saldo,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            // Create kode akun for pengeluaran
+            foreach ($pengeluaranCategories as $index => $category) {
+                $kodeAkun = KodeAkun::firstOrCreate(
+                    [
+                        'user_id' => $admin->id,
+                        'kode_akun' => '5-10' . ($index + 1),
+                    ],
+                    [
+                        'nama_akun' => $category,
+                        'kategori_akun' => 'Pengeluaran',
+                    ]
+                );
+                $kodeAkunPengeluaran[] = $kodeAkun;
+            }
+
+            // Generate transactions for the last 3 months
+            $startDate = Carbon::now()->subMonths(3);
+            $endDate = Carbon::now();
+
+            // Generate 30-50 random transactions per admin
+            $transactionCount = rand(30, 50);
+
+            for ($i = 0; $i < $transactionCount; $i++) {
+                // Random date within the range
+                $randomDate = Carbon::createFromTimestamp(
+                    rand($startDate->timestamp, $endDate->timestamp)
+                );
+
+                // Randomly choose between pemasukan and pengeluaran (60% pemasukan, 40% pengeluaran)
+                $jenis = rand(1, 100) <= 60 ? 'pemasukan' : 'pengeluaran';
+
+                if ($jenis === 'pemasukan') {
+                    $kodeAkun = $kodeAkunPemasukan[array_rand($kodeAkunPemasukan)];
+                    // Random amount between 50,000 and 5,000,000
+                    $nominal = rand(50, 5000) * 1000;
+                } else {
+                    $kodeAkun = $kodeAkunPengeluaran[array_rand($kodeAkunPengeluaran)];
+                    // Random amount between 20,000 and 2,000,000
+                    $nominal = rand(20, 2000) * 1000;
+                }
+
+                Kas::create([
+                    'user_id' => $admin->id,
+                    'kodeakun_id' => $kodeAkun->id,
+                    'tanggal' => $randomDate->format('Y-m-d'),
+                    'jenis' => $jenis,
+                    'nominal' => $nominal,
+                    'keterangan' => $this->generateKeterangan($jenis, $kodeAkun->nama_akun),
+                ]);
+            }
+
+            $this->command->info("Generated {$transactionCount} transactions for admin: {$admin->name}");
+        }
+
+        $this->command->info('Kas seeder completed successfully!');
+    }
+
+    /**
+     * Generate random keterangan based on transaction type
+     */
+    private function generateKeterangan($jenis, $namaAkun): string
+    {
+        $keteranganPemasukan = [
+            "Infaq dari jamaah",
+            "Donasi {$namaAkun}",
+            "Penerimaan {$namaAkun}",
+            "Kolekte shalat Jumat",
+            "Sumbangan dari dermawan",
+            "Infaq kotak amal",
+            "Zakat fitrah",
+            "Zakat mal",
+        ];
+
+        $keteranganPengeluaran = [
+            "Pembayaran {$namaAkun}",
+            "Biaya {$namaAkun} bulan ini",
+            "Pengeluaran untuk {$namaAkun}",
+            "Pembelian {$namaAkun}",
+            "Maintenance {$namaAkun}",
+            "Pembayaran rutin {$namaAkun}",
+        ];
+
+        if ($jenis === 'pemasukan') {
+            return $keteranganPemasukan[array_rand($keteranganPemasukan)];
+        } else {
+            return $keteranganPengeluaran[array_rand($keteranganPengeluaran)];
         }
     }
 }

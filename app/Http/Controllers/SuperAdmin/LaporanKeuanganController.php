@@ -17,8 +17,7 @@ class LaporanKeuanganController extends Controller
             ->leftJoin('kas', function ($join) {
                 $join->on('users.id', '=', 'kas.user_id')
                     ->whereRaw('kas.id = (SELECT MAX(id) FROM kas WHERE kas.user_id = users.id)');
-            })
-            ->addSelect('kas.saldo');
+            });
 
         // Search filter
         if ($request->filled('search')) {

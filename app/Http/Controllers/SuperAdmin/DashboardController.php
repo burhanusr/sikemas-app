@@ -13,9 +13,9 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        // Get date range from request or use defaults
-        $startDate = $request->get('start_date', now()->startOfMonth()->format('Y-m-d'));
-        $endDate = $request->get('end_date', now()->format('Y-m-d'));
+        // Get year from request or use current year
+        $year = $request->get('year', now()->year);
+        $transactionType = $request->get('transaction_type', 'pemasukan'); // Default to pemasukan
 
         // Count total users
         $totalUsers = User::count();
@@ -26,46 +26,50 @@ class DashboardController extends Controller
         // Count regular admins
         $totalAdmin = User::where('role', 'admin')->count();
 
-        // Get all admin user IDs (not superadmin)
-        $adminUserIds = User::where('role', 'admin')->pluck('id');
+        // Get all admin users
+        $adminUsers = User::where('role', 'admin')->get();
 
         // Get total pemasukan from all admin masjid for current month
-        $totalPemasukanAll = Kas::whereIn('user_id', $adminUserIds)
+        $totalPemasukanAll = Kas::whereHas('user', function ($query) {
+            $query->where('role', 'admin');
+        })
             ->where('jenis', 'pemasukan')
             ->whereMonth('tanggal', now()->month)
             ->whereYear('tanggal', now()->year)
             ->sum('nominal');
 
         // Get total pengeluaran from all admin masjid for current month
-        $totalPengeluaranAll = Kas::whereIn('user_id', $adminUserIds)
+        $totalPengeluaranAll = Kas::whereHas('user', function ($query) {
+            $query->where('role', 'admin');
+        })
             ->where('jenis', 'pengeluaran')
             ->whereMonth('tanggal', now()->month)
             ->whereYear('tanggal', now()->year)
             ->sum('nominal');
 
-        // Calculate total saldo from all masjid
-        // Get the latest saldo for each admin
-        $totalSaldoAll = DB::table('kas as k1')
-            ->select('k1.user_id', 'k1.saldo')
-            ->whereIn('k1.user_id', $adminUserIds)
-            ->whereRaw('k1.id = (
-                SELECT k2.id
-                FROM kas k2
-                WHERE k2.user_id = k1.user_id
-                ORDER BY k2.tanggal DESC, k2.id DESC
-                LIMIT 1
-            )')
-            ->get()
-            ->sum('saldo');
+        // Calculate total saldo
+        $totalSaldoAll = $totalPemasukanAll - $totalPengeluaranAll;
 
-        // Get chart data for all admin masjid
-        $chartData = $this->getChartData($adminUserIds, $startDate, $endDate);
+        // Get chart data for the selected year
+        $chartData = $this->getYearlyChartData($adminUsers, $year, $transactionType);
+
+        // Get admin data summary for the selected year
+        $adminData = $this->getAdminYearSummary($adminUsers, $year, $transactionType);
 
         // Get recent admin activities (last 5 registered admins)
         $recentAdminActivities = User::where('role', 'admin')
             ->latest()
             ->limit(5)
             ->get();
+
+        // Get available years for dropdown
+        $availableYears = Kas::selectRaw('DISTINCT YEAR(tanggal) as year')
+            ->orderBy('year', 'desc')
+            ->pluck('year');
+
+        if ($availableYears->isEmpty()) {
+            $availableYears = collect([now()->year]);
+        }
 
         return view('superadmin.dashboard', compact(
             'totalUsers',
@@ -76,167 +80,93 @@ class DashboardController extends Controller
             'totalSaldoAll',
             'chartData',
             'recentAdminActivities',
-            'startDate',
-            'endDate'
+            'year',
+            'transactionType',
+            'adminData',
+            'availableYears'
         ));
     }
 
     /**
-     * Generate chart data for all admin masjid
+     * Generate chart data for all admins by month in a year
      */
-    private function getChartData($adminUserIds, $startDate, $endDate)
+    private function getYearlyChartData($adminUsers, $year, $transactionType)
     {
-        $start = Carbon::parse($startDate);
-        $end = Carbon::parse($endDate);
+        $months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Oct', 'Nov', 'Des'];
+        $datasets = [];
 
-        // Determine grouping based on date range
-        $daysDiff = $start->diffInDays($end);
+        // Color palette for different admins
+        $colors = [
+            ['border' => 'rgb(59, 130, 246)', 'bg' => 'rgba(59, 130, 246, 0.1)'],    // Blue
+            ['border' => 'rgb(249, 115, 22)', 'bg' => 'rgba(249, 115, 22, 0.1)'],    // Orange
+            ['border' => 'rgb(34, 197, 94)', 'bg' => 'rgba(34, 197, 94, 0.1)'],      // Green
+            ['border' => 'rgb(168, 85, 247)', 'bg' => 'rgba(168, 85, 247, 0.1)'],    // Purple
+            ['border' => 'rgb(236, 72, 153)', 'bg' => 'rgba(236, 72, 153, 0.1)'],    // Pink
+            ['border' => 'rgb(14, 165, 233)', 'bg' => 'rgba(14, 165, 233, 0.1)'],    // Sky
+            ['border' => 'rgb(234, 179, 8)', 'bg' => 'rgba(234, 179, 8, 0.1)'],      // Yellow
+            ['border' => 'rgb(239, 68, 68)', 'bg' => 'rgba(239, 68, 68, 0.1)'],      // Red
+        ];
 
-        if ($daysDiff <= 31) {
-            // Daily grouping for ranges up to 31 days
-            return $this->getDailyChartData($adminUserIds, $start, $end);
-        } elseif ($daysDiff <= 365) {
-            // Monthly grouping for ranges up to 1 year
-            return $this->getMonthlyChartData($adminUserIds, $start, $end);
-        } else {
-            // Yearly grouping for longer ranges
-            return $this->getYearlyChartData($adminUserIds, $start, $end);
-        }
-    }
+        foreach ($adminUsers as $index => $admin) {
+            $monthlyData = [];
 
-    /**
-     * Get daily chart data for all admin masjid
-     */
-    private function getDailyChartData($adminUserIds, $start, $end)
-    {
-        $labels = [];
-        $pemasukan = [];
-        $pengeluaran = [];
+            // Get data for each month (1-12)
+            for ($month = 1; $month <= 12; $month++) {
+                $total = Kas::where('user_id', $admin->id)
+                    ->where('jenis', $transactionType)
+                    ->whereYear('tanggal', $year)
+                    ->whereMonth('tanggal', $month)
+                    ->sum('nominal');
 
-        // Get all transactions in the date range from all admins
-        $transactions = Kas::whereIn('user_id', $adminUserIds)
-            ->whereBetween('tanggal', [$start->format('Y-m-d'), $end->format('Y-m-d')])
-            ->select(
-                DB::raw('DATE(tanggal) as date'),
-                'jenis',
-                DB::raw('SUM(nominal) as total')
-            )
-            ->groupBy('date', 'jenis')
-            ->orderBy('date')
-            ->get()
-            ->groupBy('date');
+                $monthlyData[] = $total;
+            }
 
-        // Generate labels and data for each day
-        $currentDate = $start->copy();
-        while ($currentDate->lte($end)) {
-            $dateKey = $currentDate->format('Y-m-d');
-            $labels[] = $currentDate->format('d M');
+            // Use color from palette (cycle if more admins than colors)
+            $colorIndex = $index % count($colors);
+            $color = $colors[$colorIndex];
 
-            $dayTransactions = $transactions->get($dateKey, collect());
-
-            $pemasukan[] = $dayTransactions->where('jenis', 'pemasukan')->sum('total');
-            $pengeluaran[] = $dayTransactions->where('jenis', 'pengeluaran')->sum('total');
-
-            $currentDate->addDay();
+            $datasets[] = [
+                'label' => $admin->name . ' - ' . ($admin->organization ?? 'Masjid'),
+                'data' => $monthlyData,
+                'backgroundColor' => $color['bg'],
+                'borderColor' => $color['border'],
+                'borderWidth' => 3,
+                'fill' => true,
+                'tension' => 0.4,
+                'pointBackgroundColor' => $color['border'],
+                'pointBorderColor' => '#fff',
+                'pointBorderWidth' => 2,
+                'pointRadius' => 5,
+                'pointHoverRadius' => 7
+            ];
         }
 
         return [
-            'labels' => $labels,
-            'pemasukan' => $pemasukan,
-            'pengeluaran' => $pengeluaran
+            'labels' => $months,
+            'datasets' => $datasets,
+            'type' => $transactionType
         ];
     }
 
     /**
-     * Get monthly chart data for all admin masjid
+     * Get admin summary data for the year
      */
-    private function getMonthlyChartData($adminUserIds, $start, $end)
+    private function getAdminYearSummary($adminUsers, $year, $transactionType)
     {
-        $labels = [];
-        $pemasukan = [];
-        $pengeluaran = [];
+        $adminData = $adminUsers->map(function ($admin) use ($year, $transactionType) {
+            $total = Kas::where('user_id', $admin->id)
+                ->where('jenis', $transactionType)
+                ->whereYear('tanggal', $year)
+                ->sum('nominal');
 
-        // Get all transactions in the date range from all admins
-        $transactions = Kas::whereIn('user_id', $adminUserIds)
-            ->whereBetween('tanggal', [$start->format('Y-m-d'), $end->format('Y-m-d')])
-            ->select(
-                DB::raw('YEAR(tanggal) as year'),
-                DB::raw('MONTH(tanggal) as month'),
-                'jenis',
-                DB::raw('SUM(nominal) as total')
-            )
-            ->groupBy('year', 'month', 'jenis')
-            ->orderBy('year')
-            ->orderBy('month')
-            ->get()
-            ->groupBy(function ($item) {
-                return $item->year . '-' . str_pad($item->month, 2, '0', STR_PAD_LEFT);
-            });
+            return [
+                'id' => $admin->id,
+                'name' => $admin->name,
+                'organization' => $admin->organization ?? 'Tidak ada organisasi',
+                'total' => $total
+            ];
+        })->sortByDesc('total');
 
-        // Generate labels and data for each month
-        $currentDate = $start->copy()->startOfMonth();
-        $endOfMonth = $end->copy()->endOfMonth();
-
-        while ($currentDate->lte($endOfMonth)) {
-            $monthKey = $currentDate->format('Y-m');
-            $labels[] = $currentDate->format('M Y');
-
-            $monthTransactions = $transactions->get($monthKey, collect());
-
-            $pemasukan[] = $monthTransactions->where('jenis', 'pemasukan')->sum('total');
-            $pengeluaran[] = $monthTransactions->where('jenis', 'pengeluaran')->sum('total');
-
-            $currentDate->addMonth();
-        }
-
-        return [
-            'labels' => $labels,
-            'pemasukan' => $pemasukan,
-            'pengeluaran' => $pengeluaran
-        ];
-    }
-
-    /**
-     * Get yearly chart data for all admin masjid
-     */
-    private function getYearlyChartData($adminUserIds, $start, $end)
-    {
-        $labels = [];
-        $pemasukan = [];
-        $pengeluaran = [];
-
-        // Get all transactions in the date range from all admins
-        $transactions = Kas::whereIn('user_id', $adminUserIds)
-            ->whereBetween('tanggal', [$start->format('Y-m-d'), $end->format('Y-m-d')])
-            ->select(
-                DB::raw('YEAR(tanggal) as year'),
-                'jenis',
-                DB::raw('SUM(nominal) as total')
-            )
-            ->groupBy('year', 'jenis')
-            ->orderBy('year')
-            ->get()
-            ->groupBy('year');
-
-        // Generate labels and data for each year
-        $currentYear = $start->year;
-        $endYear = $end->year;
-
-        while ($currentYear <= $endYear) {
-            $labels[] = (string) $currentYear;
-
-            $yearTransactions = $transactions->get($currentYear, collect());
-
-            $pemasukan[] = $yearTransactions->where('jenis', 'pemasukan')->sum('total');
-            $pengeluaran[] = $yearTransactions->where('jenis', 'pengeluaran')->sum('total');
-
-            $currentYear++;
-        }
-
-        return [
-            'labels' => $labels,
-            'pemasukan' => $pemasukan,
-            'pengeluaran' => $pengeluaran
-        ];
+        return $adminData;
     }
 }
