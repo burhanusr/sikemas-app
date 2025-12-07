@@ -16,7 +16,7 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 
-class KasExport implements FromView, WithStyles, WithColumnWidths, WithEvents
+class KasExcelExport implements FromView, WithStyles, WithColumnWidths, WithEvents
 {
     protected $month;
     protected $year;
@@ -74,7 +74,7 @@ class KasExport implements FromView, WithStyles, WithColumnWidths, WithEvents
 
         $masjid = User::where('id', $this->userId)->first();
 
-        return view('exports.kas', [
+        return view('exports.kas-excel', [
             'previousBalance' => $previousBalance,
             'pemasukan' => $pemasukan,
             'pengeluaran' => $pengeluaran,

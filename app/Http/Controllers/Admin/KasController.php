@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Exports\KasExport;
+use App\Exports\KasExcelExport;
 use App\Http\Controllers\Controller;
 use App\Models\Kas;
 use App\Models\KodeAkun;
@@ -272,6 +272,32 @@ class KasController extends Controller
 
         $fileName = 'Laporan_Kas_' . \Carbon\Carbon::create($year, $month)->format('F_Y') . '.xlsx';
 
-        return Excel::download(new KasExport($month, $year, $userId), $fileName);
+        return Excel::download(new KasExcelExport($month, $year, $userId), $fileName);
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $userId = $this->getUserId($request);
+        $month = $request->get('month', now()->month);
+        $year = $request->get('year', now()->year);
+
+        $pdfExport = new \App\Exports\KasPdfExport($month, $year, $userId);
+        $data = $pdfExport->getData();
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('exports.kas-pdf', $data);
+
+        // Set paper size and orientation
+        $pdf->setPaper('A4', 'portrait');
+
+        // Set options
+        $pdf->setOptions([
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => true,
+            'defaultFont' => 'Arial'
+        ]);
+
+        $fileName = 'Laporan_Kas_' . \Carbon\Carbon::create($year, $month)->format('F_Y') . '.pdf';
+
+        return $pdf->download($fileName);
     }
 }

@@ -3,7 +3,8 @@
         <td colspan="6">LAPORAN AKTIVITAS KEUANGAN {{ strtoupper($masjid->organization) }}</td>
     </tr>
     <tr>
-        <td colspan="6">BULAN {{ strtoupper(\Carbon\Carbon::create($year, $month)->translatedFormat('F Y')) }}</td>
+        <td colspan="6">BULAN
+            {{ strtoupper(\Carbon\Carbon::create($year, $month)->locale('id')->translatedFormat('F Y')) }}</td>
     </tr>
     <tr></tr>
     <tr>
@@ -24,7 +25,7 @@
     {{-- Total Saldo per Previous Month --}}
     <tr>
         <td colspan="5">Total Saldo per
-            {{ \Carbon\Carbon::create($year, $month)->subMonth()->translatedFormat('F Y') }}</td>
+            {{ \Carbon\Carbon::create($year, $month)->subMonth()->locale('id')->translatedFormat('F Y') }}</td>
         <td>{{ $previousBalance }}</td>
     </tr>
 

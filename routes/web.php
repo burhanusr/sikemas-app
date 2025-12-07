@@ -55,6 +55,7 @@ Route::middleware('auth')->group(function () {
         Route::patch('/discussions/{id}/reopen', [DiscussionController::class, 'reopen'])->name('discussions.reopen');
 
         Route::get('/kas/export', [KasController::class, 'export'])->name('kas.export');
+        Route::get('/kas/export-pdf', [KasController::class, 'exportPdf'])->name('kas.export.pdf');
     });
 
     // SuperAdmin routes

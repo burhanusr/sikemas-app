@@ -15,13 +15,11 @@ class Kas extends Model
         'jenis',
         'nominal',
         'keterangan',
-        'saldo',
     ];
 
     protected $casts = [
         'tanggal' => 'date',
         'nominal' => 'decimal:2',
-        'saldo' => 'decimal:2',
     ];
 
     public function kodeAkun()

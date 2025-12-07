@@ -48,14 +48,24 @@
                     <p class="mt-1 text-gray-600">Riwayat semua transaksi keuangan yang telah dilakukan</p>
                 </div>
                 <div class="flex items-center gap-2">
-                    <!-- Export Button -->
-                    <button onclick="openExportModal()"
-                        class="inline-flex items-center gap-2 rounded-lg bg-green-500 px-4 py-2 text-sm font-medium text-white shadow transition hover:bg-green-600">
+                    <!-- Export Excel Button -->
+                    <button onclick="openExportModal('excel')" id="excelButton"
+                        class="inline-flex items-center gap-2 rounded-lg bg-green-500 px-4 py-2 text-sm font-medium text-white shadow transition hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-50">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        Export Excel
+                        <span id="excelButtonText">Export Excel</span>
+                    </button>
+
+                    <!-- Export PDF Button -->
+                    <button onclick="openExportModal('pdf')" id="pdfButton"
+                        class="inline-flex items-center gap-2 rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white shadow transition hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                        <span id="pdfButtonText">Export PDF</span>
                     </button>
 
                     <span
@@ -407,11 +417,11 @@
         class="modal-overlay fixed inset-0 z-50 hidden items-center justify-center bg-black/30 p-4 backdrop-blur-sm">
         <div class="modal-content w-full max-w-md transform rounded-xl bg-white shadow-2xl"
             onclick="event.stopPropagation()">
-            <div class="rounded-t-xl bg-gradient-to-r from-green-500 to-green-600 px-6 py-5">
+            <div id="modalHeader" class="rounded-t-xl px-6 py-5">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h3 class="text-xl font-bold text-white">Export Laporan Excel</h3>
-                        <p class="mt-1 text-green-50">Pilih bulan dan tahun untuk export</p>
+                        <h3 id="modalTitle" class="text-xl font-bold text-white"></h3>
+                        <p id="modalSubtitle" class="mt-1"></p>
                     </div>
                     <button onclick="closeExportModal()" class="text-white transition-colors hover:text-gray-200">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -422,7 +432,7 @@
                 </div>
             </div>
 
-            <form method="GET" action="{{ route('kas.export') }}" class="p-6">
+            <form id="exportForm" method="GET" class="p-6">
                 @if (isset($user) && $user->id !== Auth::id())
                     <input type="hidden" name="user_id" value="{{ $user->id }}">
                 @endif
@@ -459,13 +469,13 @@
                         class="flex-1 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
                         Batal
                     </button>
-                    <button type="submit"
-                        class="flex-1 rounded-lg bg-gradient-to-r from-green-500 to-green-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:from-green-600 hover:to-green-700">
+                    <button type="submit" id="exportButton"
+                        class="flex-1 rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-all">
                         <svg class="mr-2 inline h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        Export
+                        <span id="exportButtonText">Export</span>
                     </button>
                 </div>
             </form>
@@ -567,7 +577,106 @@
     </div>
 
     <script>
+        let currentExportType = 'excel';
+        let isExporting = false;
+
+        function openExportModal(type) {
+            if (isExporting) return; // Prevent opening modal while exporting
+
+            currentExportType = type;
+            const modal = document.getElementById('exportModal');
+            const form = document.getElementById('exportForm');
+            const header = document.getElementById('modalHeader');
+            const title = document.getElementById('modalTitle');
+            const subtitle = document.getElementById('modalSubtitle');
+            const button = document.getElementById('exportButton');
+            const buttonText = document.getElementById('exportButtonText');
+
+            if (type === 'excel') {
+                form.action = '{{ route('kas.export') }}';
+                header.className = 'rounded-t-xl bg-gradient-to-r from-green-500 to-green-600 px-6 py-5';
+                title.textContent = 'Export Laporan Excel';
+                subtitle.textContent = 'Pilih bulan dan tahun untuk export';
+                subtitle.className = 'mt-1 text-green-50';
+                button.className =
+                    'flex-1 rounded-lg bg-gradient-to-r from-green-500 to-green-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:from-green-600 hover:to-green-700 disabled:opacity-50 disabled:cursor-not-allowed';
+                buttonText.textContent = 'Export Excel';
+            } else {
+                form.action = '{{ route('kas.export.pdf') }}';
+                header.className = 'rounded-t-xl bg-gradient-to-r from-red-500 to-red-600 px-6 py-5';
+                title.textContent = 'Export Laporan PDF';
+                subtitle.textContent = 'Pilih bulan dan tahun untuk export';
+                subtitle.className = 'mt-1 text-red-50';
+                button.className =
+                    'flex-1 rounded-lg bg-gradient-to-r from-red-500 to-red-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:from-red-600 hover:to-red-700 disabled:opacity-50 disabled:cursor-not-allowed';
+                buttonText.textContent = 'Export PDF';
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeExportModal() {
+            if (isExporting) return; // Prevent closing modal while exporting
+
+            const modal = document.getElementById('exportModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Handle form submission with loading state
         document.addEventListener('DOMContentLoaded', function() {
+            const exportForm = document.getElementById('exportForm');
+
+            if (exportForm) {
+                exportForm.addEventListener('submit', function(e) {
+                    if (isExporting) {
+                        e.preventDefault();
+                        return;
+                    }
+
+                    // Set exporting state
+                    isExporting = true;
+
+                    // Disable buttons
+                    const excelButton = document.getElementById('excelButton');
+                    const pdfButton = document.getElementById('pdfButton');
+                    const exportButton = document.getElementById('exportButton');
+                    const exportButtonText = document.getElementById('exportButtonText');
+
+                    if (excelButton) excelButton.disabled = true;
+                    if (pdfButton) pdfButton.disabled = true;
+                    if (exportButton) exportButton.disabled = true;
+
+                    // Update button text with loading indicator
+                    const originalText = exportButtonText.textContent;
+                    exportButtonText.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Memproses...
+            `;
+
+                    // Close modal after a short delay
+                    setTimeout(() => {
+                        closeExportModal();
+
+                        // Reset button states after download completes (estimated 3 seconds)
+                        setTimeout(() => {
+                            isExporting = false;
+                            if (excelButton) excelButton.disabled = false;
+                            if (pdfButton) pdfButton.disabled = false;
+                            if (exportButton) exportButton.disabled = false;
+                            exportButtonText.textContent = originalText;
+                        }, 3000);
+                    }, 500);
+                });
+            }
+
+            // Other existing code...
             const searchInput = document.getElementById('searchInput');
             if (searchInput) {
                 searchInput.addEventListener('keypress', function(e) {
@@ -588,12 +697,12 @@
             const exportModal = document.getElementById('exportModal');
             if (exportModal) {
                 exportModal.addEventListener('click', function(e) {
-                    if (e.target === this) closeExportModal();
+                    if (e.target === this && !isExporting) closeExportModal();
                 });
             }
 
             document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
+                if (e.key === 'Escape' && !isExporting) {
                     closeDetailModal();
                     closeExportModal();
                 }
@@ -602,20 +711,6 @@
 
         function formatRupiah(number) {
             return 'Rp ' + new Intl.NumberFormat('id-ID').format(number);
-        }
-
-        function openExportModal() {
-            const modal = document.getElementById('exportModal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeExportModal() {
-            const modal = document.getElementById('exportModal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-            document.body.style.overflow = 'auto';
         }
 
         function openDetailModal(item) {
